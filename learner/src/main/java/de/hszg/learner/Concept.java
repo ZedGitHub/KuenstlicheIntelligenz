@@ -1,5 +1,5 @@
 package de.hszg.learner;
 
 public enum Concept {
-	Unknown, Vorfahrt, Stop, RechtsAbbiegen, LinksAbbiegen,  //TODO: die Zeichen aus den Dateien
+	Unknown, VorfahrtVonRechts, VorfahrtGewaehren, Stop, RechtsAbbiegen, LinksAbbiegen, Vorfahrtsstrasse
 }
