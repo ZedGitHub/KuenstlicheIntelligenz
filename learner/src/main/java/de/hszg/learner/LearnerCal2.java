@@ -2,6 +2,7 @@ package de.hszg.learner;
 import java.util.List;
 
 public interface Learner {
+
 	/** The training method, that chances the internal state of the learner such that 
 	 * it will classify examples of a similar set (i.e. the testSet better.
 	 * 
