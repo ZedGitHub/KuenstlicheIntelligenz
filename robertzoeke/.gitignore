@@ -1,7 +1,7 @@
 /target/
-/src/test/resources/
 *.iml
 /.idea/
+/.metadata/
 /.settings/
 .classpath
 .project
