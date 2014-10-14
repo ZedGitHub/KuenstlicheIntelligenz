@@ -1,4 +1,4 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.learner;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import de.hszg.ki.robertzoeke.featureVector.FeatureVector;
 
 
 

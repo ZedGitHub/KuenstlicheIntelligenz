@@ -1,5 +1,7 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.learner;
 import java.util.List;
+
+import de.hszg.ki.robertzoeke.featureVector.FeatureVector;
 
 public interface Learner {
 	/** The training method, that chances the internal state of the learner such that 

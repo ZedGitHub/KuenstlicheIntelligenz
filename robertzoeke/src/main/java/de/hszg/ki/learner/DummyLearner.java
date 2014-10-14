@@ -1,6 +1,8 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.learner;
 
 import java.util.List;
+
+import de.hszg.ki.robertzoeke.featureVector.FeatureVector;
 
 
 /** a dummy class to implement a learner that will not do any 

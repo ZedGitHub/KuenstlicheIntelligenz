@@ -1,6 +1,8 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.robertzoeke.featureVector;
 
 import java.io.Serializable;
+
+import de.hszg.ki.learner.Concept;
 
 public interface FeatureVector extends Serializable{
 	

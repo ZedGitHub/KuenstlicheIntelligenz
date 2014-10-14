@@ -1,4 +1,6 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.learner;
+
+import de.hszg.ki.robertzoeke.featureVector.FeatureVector;
 
 public class DummyFeatureVector implements FeatureVector {
 

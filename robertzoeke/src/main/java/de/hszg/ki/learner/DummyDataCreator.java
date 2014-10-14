@@ -1,10 +1,12 @@
-package de.hszg.ki.robertzoeke.learner;
+package de.hszg.ki.learner;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.hszg.ki.robertzoeke.featureVector.FeatureVector;
 
 public class DummyDataCreator {
 
@@ -13,7 +15,7 @@ public class DummyDataCreator {
 		FeatureVector[] f = new FeatureVector[6];
 		f[0] = new DummyFeatureVector(4,2,1,Concept.Stop);
 		f[1] = new DummyFeatureVector(1,2,3,Concept.Stop);
-		f[2] = new DummyFeatureVector(4,5,6,Concept.Vorfahrt);
+		f[2] = new DummyFeatureVector(4,5,6,Concept.Vorfahrtsstrasse);
 		f[3] = new DummyFeatureVector(1,5,3,Concept.RechtsAbbiegen);
 		f[4] = new DummyFeatureVector(3,2,5,Concept.Stop);
 		f[5] = new DummyFeatureVector(5,2,1,Concept.LinksAbbiegen);
