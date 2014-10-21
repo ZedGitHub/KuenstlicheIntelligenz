@@ -6,6 +6,9 @@ import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.hszg.learner.featureVector.DummyFeatureVector;
+import de.hszg.learner.featureVector.FeatureVector;
+
 public class DummyDataCreator {
 
 	private static final String filename = "DummyData.dat";

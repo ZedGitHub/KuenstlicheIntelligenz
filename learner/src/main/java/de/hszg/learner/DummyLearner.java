@@ -2,6 +2,8 @@ package de.hszg.learner;
 
 import java.util.List;
 
+import de.hszg.learner.featureVector.FeatureVector;
+
 
 /** a dummy class to implement a learner that will not do any 
  * learning and will the think, everything corresponds to 

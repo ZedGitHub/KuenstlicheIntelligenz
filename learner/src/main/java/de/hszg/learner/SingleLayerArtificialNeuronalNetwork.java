@@ -2,6 +2,8 @@ package de.hszg.learner;
 
 import java.util.List;
 
+import de.hszg.learner.featureVector.FeatureVector;
+
 /**
  * Created by Daniel on 14.10.2014.
  */

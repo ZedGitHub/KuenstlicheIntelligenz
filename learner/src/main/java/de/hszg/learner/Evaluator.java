@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import de.hszg.learner.featureVector.FeatureVector;
+
 
 
 
@@ -23,9 +25,9 @@ public class Evaluator {
 		Learner learner = new DummyLearner();
 		
 		
-		// TODO: folgendes muss zur Evaluierung mehrfach ausgeführt werden
+		// TODO: folgendes muss zur Evaluierung mehrfach ausgefï¿½hrt werden
 		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
-		// wie oft, das hängt vom gewünschten Vertrauensintervall ab
+		// wie oft, das hï¿½ngt vom gewï¿½nschten Vertrauensintervall ab
 		do{
 			vectors = mixData(vectors);
 			List<List<FeatureVector>> sets = extractTrainingData(vectors);
@@ -73,7 +75,7 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
  * (usually) in different order
  */
 	private List<FeatureVector> mixData(List<FeatureVector> vectors) {
-		// TODO: die Reihenfolge der Elemente zufällig verändern
+		// TODO: die Reihenfolge der Elemente zufï¿½llig verï¿½ndern
 		return vectors;
 	}
 
