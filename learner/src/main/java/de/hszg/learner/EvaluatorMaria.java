@@ -19,7 +19,7 @@ public class EvaluatorMaria {
 	private static int testRate = 40; 
 
 	
-	public Evaluator(String filename) {
+	public EvaluatorMaria(String filename) {
 		List<FeatureVector> vectors = readData(filename);
 		
 		Learner learner = new DummyLearner();
