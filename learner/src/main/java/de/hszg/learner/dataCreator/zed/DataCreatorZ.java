@@ -11,30 +11,28 @@ import de.hszg.learner.featureVector.FeatureVector;
 import de.hszg.learner.featureVector.zed.FeatureVectorZ;
 
 /**
- * Creates a {@value #filename} file containing Feature Vectors of
- * {@value #numberOfVectorsToCreate} randomly chosen files from {@value #path}
- * 
+ * Creates a {@value #filename} file in {@value #pathToDataFile} containing Feature Vectors of
+ * {@value #numberOfVectorsToCreate} randomly chosen files from {@value #pathToSigns}
+ * To create a File {@value #dummyFilename} pass the argument "dummy".
  * @author z
  *
  */
 public class DataCreatorZ {
 
-	// zdata.dat
-	private static final String filename = "zDummyData.dat";
-	private static final int numberOfVectorsToCreate = 1000;
+	private static final String filename = "zdata.dat";
+	private static final String dummyFilename = "zDummyData.dat";
+	
 	private static final String pathToSigns = "/home/z/Studium/KI/Verkehrszeichen";
 	private static final String pathToDataFile = "src/main/resources/";
 	
+	private static final int numberOfVectorsToCreate = 1000;
 
-	public DataCreatorZ() {
-		writeDataFile(createDummyData(), "zDummyData.dat");
-		// TODO
-		// read random images from filesystem
-		// create new vectors
-
-
-		// FeatureVectorZ[] vectors = new
-		// FeatureVectorZ[numberOfVectorsToCreate];
+	public DataCreatorZ(boolean dummy) {
+		if (dummy){
+		writeDataFile(createDummyData(), dummyFilename);
+		}else{
+			writeDataFile(createRandomData(),filename);
+		}
 	}
 
 	private FeatureVectorZ[] createDummyData() {
@@ -84,7 +82,11 @@ public class DataCreatorZ {
 	}
 
 	private FeatureVectorZ[] createRandomData() {
-		return null;
+		FeatureVectorZ[] result = new FeatureVectorZ[numberOfVectorsToCreate];
+		// TODO
+		// read random images from filesystem
+		// create new vectors
+		return result;
 	}
 	
 	private void writeDataFile(FeatureVectorZ[] features, String name){
@@ -104,7 +106,12 @@ public class DataCreatorZ {
 	}
 
 	public static void main(String[] args) {
-		new DataCreatorZ();
+		if(args.length == 0){
+			new DataCreatorZ(false);
+		}else{
+			if(args[0].equals("dummy")){
+				new DataCreatorZ(true);			
+			}
+		}
 	}
-
 }
