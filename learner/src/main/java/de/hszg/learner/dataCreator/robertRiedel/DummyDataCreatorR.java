@@ -7,34 +7,49 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.hszg.learner.Concept;
-import de.hszg.learner.featureVector.DummyFeatureVector;
-import de.hszg.learner.featureVector.FeatureVector;
+import de.hszg.learner.featureVector.robertRiedel.FeatureVectorR;
 
-public class DummyDataCreatorR {
+/**
+ * All the the data is accumulated here and written to disk
+ * 
+ * @author RobertRiedel
+ *
+ */
+public class DummyDataCreatorR
+{
 
-	private static final String filename = "DummyData.dat";
-	DummyDataCreatorR(){
-		FeatureVector[] f = new FeatureVector[6];
-		f[0] = new DummyFeatureVector(4,2,1,Concept.Stop);
-		f[1] = new DummyFeatureVector(1,2,3,Concept.Stop);
-		f[2] = new DummyFeatureVector(4,5,6,Concept.Vorfahrtsstrasse);
-		f[3] = new DummyFeatureVector(1,5,3,Concept.RechtsAbbiegen);
-		f[4] = new DummyFeatureVector(3,2,5,Concept.Stop);
-		f[5] = new DummyFeatureVector(5,2,1,Concept.LinksAbbiegen);
-		
-		List<FeatureVector> res = new LinkedList<>();
-		for(FeatureVector fv : f) res.add(fv);
-		try{
+	public static void main(String[] args)
+	{
+		new DummyDataCreatorR();
+	}
+
+	private static final String	filename	= "DummyData.dat";
+
+	DummyDataCreatorR()
+	{
+		FeatureVectorR[] features = new FeatureVectorR[6];
+		features[0] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+		features[1] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+		features[2] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+		features[3] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+		features[4] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+		features[5] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
+
+		List<FeatureVectorR> res = new LinkedList<>();
+		for (FeatureVectorR featureVector : features)
+			res.add(featureVector);
+		try
+		{
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
 			out.writeObject(res);
 			out.close();
-		}catch(Throwable t){
-			System.out.println("DummyDataCreator: Could not create DummyData.dat");
+			System.out.println("done writing " + filename);
+		}
+		catch (Throwable t)
+		{
+			System.out.println("DummyDataCreator: Could not create " + filename);
 			t.printStackTrace();
 		}
-	}
-	public static void main(String[] args) {
-		new DummyDataCreatorR();
 	}
 
 }
