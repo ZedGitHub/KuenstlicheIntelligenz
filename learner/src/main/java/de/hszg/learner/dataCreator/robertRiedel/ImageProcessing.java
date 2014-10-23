@@ -16,6 +16,13 @@ import javax.imageio.ImageIO;
  */
 public class ImageProcessing
 {
+	String	rootPathToSigns				= "f:\\";
+	String	folderNameVorfahrtVonRechts	= "102 - Vorfahrt von rechts";
+	String	folderNameVorfahrtGewaehren	= "205 - Vorfahrt gewaehren";
+	String	folderNameStop				= "206 - Stop";
+	String	folderNameRechtsAbbiegen	= "";
+	String	folderNameLinksAbbiegen		= "209 - Fahrtrichtung links";
+	String	folderNameVorfahrtsstrasse	= "306 - Vorfahrtsstrße";
 
 	/**
 	 * get an image from specified source
@@ -105,6 +112,43 @@ public class ImageProcessing
 		int width = image.getWidth();
 		int height = image.getHeight();
 		Map colorsFound = new HashMap<Integer, Integer>();
+		colorsFound = getColorsPresent(image, width, height, colorsFound);
+
+		int maxAmount = 0;
+		maxAmount = getMostFoundColor(colorsFound, maxAmount);
+		surroundingColor = getKeyOfMostfoundColor(surroundingColor, colorsFound, maxAmount);
+		System.out.println("chose surrounding color(as int) " + surroundingColor + " with " + maxAmount + " pixel");
+		return surroundingColor;
+	}
+
+	private int getKeyOfMostfoundColor(int surroundingColor, Map colorsFound, int maxAmount)
+	{
+		for (Iterator iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
+		{
+			Integer key = (Integer) iterator.next();
+			if ((Integer) colorsFound.get(key) == maxAmount)
+			{
+				surroundingColor = key;
+			}
+		}
+		return surroundingColor;
+	}
+
+	private int getMostFoundColor(Map colorsFound, int maxAmount)
+	{
+		for (Iterator iterator = colorsFound.values().iterator(); iterator.hasNext();)
+		{
+			Integer value = (Integer) iterator.next();
+			if (value > maxAmount)
+			{
+				maxAmount = value;
+			}
+		}
+		return maxAmount;
+	}
+
+	private Map<Integer, Integer> getColorsPresent(BufferedImage image, int width, int height, Map colorsFound)
+	{
 		for (int i = 0; i < height; i++)
 		{
 			for (int j = 0; j < width; j++)
@@ -121,15 +165,37 @@ public class ImageProcessing
 				}
 			}
 		}
-		for (Iterator iterator = colorsFound.values().iterator(); iterator.hasNext();)
-		{
-			Integer amount = (Integer) iterator.next();
-			if (amount > surroundingColor)
-			{
-				surroundingColor = amount;
-			}
-		}
-		return surroundingColor;
+		System.out.println("found " + colorsFound.size() + " colors");
+		return colorsFound;
 	}
 
+	public boolean isYellow(int pixel)
+	{
+		// TODO
+		return false;
+	}
+
+	public boolean isBlue(int pixel)
+	{
+		// TODO
+		return false;
+	}
+
+	public boolean isBlack(int pixel)
+	{
+		// TODO
+		return false;
+	}
+
+	public boolean isWhite(int pixel)
+	{
+		// TODO
+		return false;
+	}
+
+	public boolean isred(int pixel)
+	{
+		// TODO
+		return false;
+	}
 }
