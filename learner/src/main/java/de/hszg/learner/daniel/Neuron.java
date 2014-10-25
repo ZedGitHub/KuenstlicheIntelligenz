@@ -40,7 +40,7 @@ public class Neuron {
     /**
      * Calculates the sum of the featureVector with the costs and the threshold
      * @param featureVector
-     * @return
+     * @return the sum calculated by the neuron
      */
     public int calculateSum(FeatureVector featureVector) {
         int sum = 0;
@@ -52,6 +52,11 @@ public class Neuron {
         return sum - threshold;
     }
 
+    /**
+     * This method corrects the costs corresponding to the learn algorithm [MinskyPapert69] of the neuron
+     * @param featureVector the featureVector Which had to be calculated
+     * @param sum the sum which was calculated
+     */
     public void correctCosts(FeatureVector featureVector, int sum){
         if (sum >= 0) {
             for (int i = 0; i < featureVector.getNumFeatures(); i++) {

@@ -23,22 +23,40 @@ public class EvaluatorDaniel {
 
 
 	public EvaluatorDaniel(String filename) {
+        int i = 0;
+        int numberOfTests = 100000;
+
 		List<FeatureVector> vectors = readData(filename);
 		
 		Learner learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures());
 		
-		
+		float success = 0;
+        float unknown = 0;
+        float wrong = 0;
+
+
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
 		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
 		// wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
 		do{
+            learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures()); //if the initialization isn't made each time the evaluation is the same every time, hoping that this is a problem which only occurs since we haven't enough data
+
 			vectors = mixData(vectors);
 			List<List<FeatureVector>> sets = extractTrainingData(vectors);
 			learner.learn(sets.get(0));
 			Vector<Integer> result = evaluate(sets.get(1),learner);
+
+            success += result.get(0) / (float) sets.get(1).size();
+            unknown += result.get(1) / (float) sets.get(1).size();
+            wrong += result.get(2) / (float) sets.get(1).size();
+
 			evalResult(result);
-		}while(false); //TODO: eine andere Abbruchbedingung verwenden
-		
+
+            i++;
+		}while(i < numberOfTests);
+
+        System.out.println("Result after " + numberOfTests + " Test with " + vectors.size() + " FeatureVectors:");
+        System.out.println("Learning result: \n correct: " + (success / numberOfTests) * 100f +"%\n unknown: " + (unknown / numberOfTests) * 100f + "%\n wrong: "+(wrong / numberOfTests) * 100f + "%");
 	}
 	/**
 	 * Evaluate the reulst from the test for output or furthjer considerations

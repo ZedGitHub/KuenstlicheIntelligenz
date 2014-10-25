@@ -23,33 +23,9 @@ public class DummyDataCreatorR
 		new DummyDataCreatorR();
 	}
 
-	private static final String	filename	= "DummyData.dat";
-
 	DummyDataCreatorR()
 	{
-		FeatureVectorR[] features = new FeatureVectorR[6];
-		features[0] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-		features[1] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-		features[2] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-		features[3] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-		features[4] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-		features[5] = new FeatureVectorR(1, 1, 1, 1, 1, 1, 4, 2, 1, Concept.Stop);
-
-		List<FeatureVectorR> res = new LinkedList<>();
-		for (FeatureVectorR featureVector : features)
-			res.add(featureVector);
-		try
-		{
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
-			out.writeObject(res);
-			out.close();
-			System.out.println("done writing " + filename);
-		}
-		catch (Throwable t)
-		{
-			System.out.println("DummyDataCreator: Could not create " + filename);
-			t.printStackTrace();
-		}
+		ImageProcessing ip = new ImageProcessing();
 	}
 
 }
