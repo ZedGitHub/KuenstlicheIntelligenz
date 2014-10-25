@@ -30,7 +30,12 @@ public class TestDataCreatorZ {
 		}
 
 	}
-
+	
+	@Test
+	public void testCreator(){
+		DataCreatorZ.main(new String[0]);
+	}
+	
 	private List<FeatureVector> readDummyFile() throws FileNotFoundException, IOException, ClassNotFoundException {
 
 		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(
