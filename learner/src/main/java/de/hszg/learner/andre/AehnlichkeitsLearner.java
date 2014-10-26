@@ -28,8 +28,7 @@ public class AehnlichkeitsLearner implements Learner{
 
 	@Override
 	public Concept classify(FeatureVector example) {
-		// TODO Auto-generated method stub
-		return null;
+		return ClassifyFromVector.classifyConcept(example, learnedVectorList);
 	}
 	
 	
