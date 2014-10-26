@@ -1,4 +1,4 @@
-package de.hszg.learner;
+package de.hszg.learner.andre;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +14,12 @@ import de.hszg.learner.featureVector.FeatureVector;
 
 public class AehnlichkeitsLearner implements Learner{
 
-	private List<FeatureVector> learnedVectorList = new ArrayList<FeatureVector>();
+	private List<LearnedFeatureVector> learnedVectorList = new ArrayList<LearnedFeatureVector>();
 	
 	@Override
 	public void learn(List<FeatureVector> trainingSet) {
 		
-		for(int i = 0; i<Concept.values().length; i++){
+		for(int i = 1; i<Concept.values().length; i++){
 			learnedVectorList.add(calculateLearnedVector(splitFeatureVector(trainingSet, Concept.values()[i]), Concept.values()[i]));
 		}
 	
@@ -31,10 +31,10 @@ public class AehnlichkeitsLearner implements Learner{
 		return null;
 	}
 	
-	private FeatureVector calculateLearnedVector(List<FeatureVector> splitFeatureVector, Concept concept) {
+	private LearnedFeatureVector calculateLearnedVector(List<FeatureVector> splitFeatureVector, Concept concept) {
 
-		int featureSum = 0;
-		List<Integer> featureList = new ArrayList<Integer>();
+		double featureSum = 0.0;
+		List<Double> featureList = new ArrayList<Double>();
 		
 		for(int i = 0; i < splitFeatureVector.get(0).getNumFeatures(); i++){
 
@@ -45,14 +45,14 @@ public class AehnlichkeitsLearner implements Learner{
 			}
 			
 			if(featureSum == 0){
-				featureList.add(0);
+				featureList.add(0.0);
 			}
 			else{
 				featureList.add(featureSum/splitFeatureVector.size());
 			}
 		}
 		
-		FeatureVector tempVector = new LearnedFeatureVector(featureList, concept);
+		LearnedFeatureVector tempVector = new LearnedFeatureVector(featureList, concept);
 		
 		return tempVector;
 	}
@@ -64,13 +64,13 @@ public class AehnlichkeitsLearner implements Learner{
 		return temp;
 	}
 	
-	public class LearnedFeatureVector implements FeatureVector {
+	public class LearnedFeatureVector{
 
 		private Concept concept;
-		private int[] feature;
+		private double[] feature;
 		
-		public LearnedFeatureVector(List<Integer> featureList, Concept conceptInput){
-			feature = new int[featureList.size()];
+		public LearnedFeatureVector(List<Double> featureList, Concept conceptInput){
+			feature = new double[featureList.size()];
 			
 			for(int i = 0; i<featureList.size(); i++){
 				feature[i] = featureList.get(i);
@@ -79,18 +79,15 @@ public class AehnlichkeitsLearner implements Learner{
 			concept = conceptInput;
 		}
 		
-		@Override
 		public Concept getConcept() {
 			return concept;
 		}
 
-		@Override
-		public int getNumFeatures() {
+		public double getNumFeatures() {
 			return feature.length;
 		}
 
-		@Override
-		public int getFeatureValue(int i) {
+		public double getFeatureValue(int i) {
 			return feature[i];
 		}
 		
