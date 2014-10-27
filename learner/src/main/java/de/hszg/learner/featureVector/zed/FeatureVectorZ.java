@@ -46,5 +46,17 @@ public class FeatureVectorZ implements FeatureVector{
 	public int getFeatureValue(int i) {
 		return this.feature[i];
 	}
+	
+	public String toString()
+	{
+		String toString = "Feature vector: ";
+		for (int i = 0; i < feature.length; i++)
+		{
+			toString += feature[i] + " ";
+		}
+		toString += concept;
+		return toString;
+
+	}
 
 }
