@@ -7,6 +7,12 @@ import java.util.stream.Collectors;
 import de.hszg.learner.Concept;
 import de.hszg.learner.featureVector.FeatureVector;
 
+/**
+ * 
+ * @author Andre Krause
+ *
+ */
+
 public class LearnFromVector {
 
 	public static LearnedFeatureVector splitAndcalculateLearnedVector(List<FeatureVector> featureVectorList, Concept concept) {

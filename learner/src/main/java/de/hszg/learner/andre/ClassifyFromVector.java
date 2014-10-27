@@ -9,6 +9,12 @@ import java.util.Map;
 import de.hszg.learner.Concept;
 import de.hszg.learner.featureVector.FeatureVector;
 
+/**
+ * 
+ * @author Andre Krause
+ *
+ */
+
 public class ClassifyFromVector {
 
 	private static Map<Concept, Double> distanceToConceptMap = new HashMap<Concept, Double>();

@@ -4,6 +4,12 @@ import java.util.List;
 
 import de.hszg.learner.Concept;
 
+/**
+ * 
+ * @author Andre Krause
+ *
+ */
+
 public class LearnedFeatureVector {
 	
 	public Concept concept;
