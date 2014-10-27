@@ -47,8 +47,11 @@ public class MultipleLayerArtificialNeuronalNetwork implements Learner {
 	@Override
 	public void learn(List<FeatureVector> trainingSet) {
 		
-		final int inputSize  = 5; // depends on feature vector
-		final int outputSize = 2; // depends on me :-)
+		trainingSet.get(0).getNumFeatures();
+		final int inputSize  = trainingSet.get(0).getNumFeatures(); 
+		
+		// output size is always 3 because classification
+		final int outputSize = 3;
 		
 		// normalize training set to internally format
 		DataSet trainingTuples = new DataSet(inputSize,outputSize);
