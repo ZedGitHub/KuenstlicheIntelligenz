@@ -1,11 +1,22 @@
 package de.hszg.learner;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
+
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.TDistribution;
+import org.apache.commons.math.distribution.TDistributionImpl;
+import org.apache.commons.math.exception.MathIllegalArgumentException;
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 import de.hszg.learner.featureVector.FeatureVector;
 
@@ -17,14 +28,14 @@ public class EvaluatorMaria {
 	/** the percentage (between 0 und 100) of vectors from the data to be used for the test
 	*/
 	private static int testRate = 40; 
-
+	private ArrayList<Double> means = new ArrayList<>();
 	
 	public EvaluatorMaria(String filename) {
-		List<FeatureVector> vectors = readData(filename);
+		List<FeatureVector> vectors = readData(filename); //Robert
 		
 		Learner learner = new DummyLearner();
 		
-		
+		int i=0;
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
 		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
 		// wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
@@ -34,9 +45,41 @@ public class EvaluatorMaria {
 			learner.learn(sets.get(0));
 			Vector<Integer> result = evaluate(sets.get(1),learner);
 			evalResult(result);
-		}while(false); //TODO: eine andere Abbruchbedingung verwenden
+			i++;
+		}while(i<101); //TODO: eine andere Abbruchbedingung verwenden
+		double sum =0; 
+		for (Double d : means)
+		{
+			sum+=d;
+		}
+		System.out.println("Im Durchnitt " + (sum/means.size())*100+"% Richtig");
 		
+		SummaryStatistics stats = new SummaryStatistics();
+	        for (double val : means) {
+	            stats.addValue(val);
+	        }
+	 
+	        // Calculate 95% confidence interval
+	        double ci = calcMeanCI(stats, 0.95);
+	        System.out.println(String.format("Mean: %f", stats.getMean()));
+	        double lower = stats.getMean() - ci;
+	        double upper = stats.getMean() + ci;
+	        System.out.println(String.format("Confidence Interval 95%%: %f, %f", lower, upper));
+	    
 	}
+
+private static double calcMeanCI(SummaryStatistics stats, double level) {
+    try {
+        // Create T Distribution with N-1 degrees of freedom
+        TDistribution tDist = new TDistributionImpl(stats.getN() - 1);
+        // Calculate critical value
+        double critVal = tDist.inverseCumulativeProbability(1.0 - (1 - level) / 2);
+        // Calculate confidence interval
+        return critVal * stats.getStandardDeviation() / Math.sqrt(stats.getN());
+    } catch (MathIllegalArgumentException | MathException e) {
+        return Double.NaN;
+    }
+}
 	/**
 	 * Evaluate the reulst from the test for output or furthjer considerations
 	 * @param result a Vector containing 3 values: a) right classification ba used learner, 
@@ -44,6 +87,11 @@ public class EvaluatorMaria {
 	 */
 	private void evalResult(Vector<Integer> result) {
 		// TODO hier muss mehr Auswertung passieren, insbes: Vertrauensintervalle etc
+		float sum=result.get(0)+result.get(1)+result.get(2); //sume
+		means.add((double) ((result.get(0)/sum)*100));//habe ein Liste wo der richten sind (%)
+		
+		
+		
 		System.out.println("Learning result: \n correct: "+result.get(0)+"\n unknown: "+result.get(1)+"\n wrong: "+result.get(2));
 	}
 	/** evaluate the learner with a given test set. 
@@ -52,6 +100,7 @@ public class EvaluatorMaria {
 	 * @param learner: The learner to be tests
 	 * 
 	 * @return a vector containing the test results: success, unknown, false
+	 * 
 	 */
 private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		int success=0;int unknown=0;int fault =0;
@@ -76,11 +125,14 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
  */
 	private List<FeatureVector> mixData(List<FeatureVector> vectors) {
 		// TODO: die Reihenfolge der Elemente zuf�llig ver�ndern
+		
+		long seed = System.nanoTime();
+		Collections.shuffle(vectors, new Random(seed));
 		return vectors;
 	}
 
 	/**
-	 * Split the set of festure vectors in a set of traing data and a set of test data.
+	 * Split the set of feature vectors in a set of traing data and a set of test data.
 	 * For representative results it is essential to mix the order of vectors 
 	 * before splitting the set
 	 * 
@@ -94,7 +146,7 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		List<FeatureVector> trainingData = new LinkedList<>();
 		List<FeatureVector> testData = new LinkedList<>();
 		
-		int cut = testRate/100 * vectors.size();
+		int cut = (int) ((testRate/100f) * vectors.size());
 		trainingData.addAll(vectors.subList(0,cut));
 		testData.addAll(vectors.subList(cut+1, vectors.size()));
 		
@@ -123,20 +175,25 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 
 	/** run the program with training set provided in file with 
 	 * name given in first parameter
-	 * @param args 1. filename of Serialiszed List<FeatureVector>
+	 * @param args 1. filename of Serialized List<FeatureVector>
 	 */
 	public static void main(String[] args){
-		String filename=null;
+		
+		
+		URL url = EvaluatorMaria.class.getResource("/zdata.dat");
+		
+		File file = null;
+		
+		/*String filename=null;
 		if(args.length==0){
 			System.out.println("No data file provided, using dummy data: DummyData.dat");
 			filename = "DummyData.dat";
 		}
 		else 
 			filename = args[0];
-		new Evaluator(filename);
+		new Evaluator(filename);*/
 		
-		
-		
+			
 	}
 }
 
