@@ -25,7 +25,7 @@ public class DummyDataCreatorR
 
 	DummyDataCreatorR()
 	{
-		ImageProcessing ip = new ImageProcessing();
+		ImageProcessorR ip = new ImageProcessorR();
 	}
 
 }
