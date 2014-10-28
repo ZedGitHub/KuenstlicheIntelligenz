@@ -3,16 +3,11 @@ package de.hszg.learner.dataCreator.robertRiedel;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-
-import de.hszg.learner.Concept;
-import de.hszg.learner.featureVector.robertRiedel.FeatureVectorR;
 
 /**
  * for all stuff done with the images to make a feature vector
@@ -27,7 +22,7 @@ public class ImageProcessorR
 	String				folderNameLinksAbbiegen		= "209 - Fahrtrichtung links";
 	String				folderNameVorfahrtsstrasse	= "306 - Vorfahrtsstrße";
 
-	ColorClassifierR	colorClassifier				= new ColorClassifierR();
+	ColorClassifierR	colorClassifier;
 
 	/**
 	 * get an image from specified source
@@ -37,27 +32,7 @@ public class ImageProcessorR
 	 */
 	public ImageProcessorR()
 	{
-		// TODO delete stuff for testing
-		// // TODO automated colorscanning from testbmps?
-		String filename = "X0Y0.jpg";
-		// // String filename = "X0Y0.jpg";
-		String source = rootPathToSigns + "\\" + folderNameVorfahrtGewaehren + "\\0\\3500\\" + filename;
-		// // String source = "C:\\Studium\\Künstliche Intelligenz\\farbTestWeiss.bmp";
-		BufferedImage image = getImageFromSource(source);
-		// getColors(image);
-		String testSource = "C:\\Studium\\Künstliche Intelligenz\\farbTestBlau.bmp";
-		BufferedImage testImage = getImageFromSource(testSource);
-		getColors(testImage);
-		int value = -12747347;
-		System.out.println("rgb: " + colorClassifier.getRedFromPixel(value) + " " + colorClassifier.getGreenFromPixel(value) + " " + colorClassifier.getBlueFromPixel(value));
-		testColorCount(testImage);
-		testColorCount(image);
-		// // getSurroundingColor(testImage);
-		// int[] features = getFeatures(image);
-		// Concept d = Concept.Stop;
-		// FeatureVectorR TestFv = new FeatureVectorR(features, d);
-		// System.out.println(TestFv);
-		// System.out.println("done");
+		colorClassifier = new ColorClassifierR();
 	}
 
 	public int[] getFeatures(File imageFile) throws IOException
@@ -273,7 +248,7 @@ public class ImageProcessorR
 				}
 			}
 		}
-		int gelb = colorClassifier.getColorTrue(counterYellow1 + counterYellow2 + counterYellow3 + counterYellow4 + counterYellowCore);
+		int gelb = colorClassifier.getColorTrue(counterYellow1 + counterYellow2 + counterYellow3 + counterYellow4 + counterYellowCore, imgSize);
 		int blauLinks = counterBlue1 + counterBlue3;
 		int blauRechts = counterBlue2 + counterBlue4;
 		int blauRelationLinksRechts = getRelation(blauLinks, blauRechts);
@@ -308,8 +283,8 @@ public class ImageProcessorR
 			else
 			{
 				result = ((double) divisor / (double) dividend);
-				System.out.println("groesser: " + result);
 				result = 100 - (result * 100);
+				System.out.println("groesser: " + result + " " + divisor + " " + dividend);
 			}
 		}
 		catch (Exception e)
@@ -503,6 +478,8 @@ public class ImageProcessorR
 			}
 		}
 		System.out.println("min int: " + minint);
+		System.out.println("min int rgb: " + colorClassifier.getRedFromPixel(minint) + " " + colorClassifier.getGreenFromPixel(minint) + " " + colorClassifier.getBlueFromPixel(minint));
+
 		int maxint = minint;
 		int maxred = minred;
 		int maxblue = minblue;
@@ -531,12 +508,8 @@ public class ImageProcessorR
 			}
 		}
 		System.out.println("max int: " + maxint);
-		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
-		{
-			Integer value = iterator.next();
+		System.out.println("max int rgb: " + colorClassifier.getRedFromPixel(maxint) + " " + colorClassifier.getGreenFromPixel(maxint) + " " + colorClassifier.getBlueFromPixel(maxint));
 
-			// System.out.println("rgb: " + colorClassifier.getRedFromPixel(value) + " " + colorClassifier.getGreenFromPixel(value) + " " + colorClassifier.getBlueFromPixel(value));
-		}
 		System.out.println("min rgb: " + minred + " " + mingreen + " " + minblue);
 		System.out.println("max rgb: " + maxred + " " + maxgreen + " " + maxblue);
 	}
