@@ -29,7 +29,7 @@ public class DataCreatorZ {
 	private static final String pathToSigns = "/home/z/Studium/KI/Verkehrszeichen/";
 	private static final String pathToDataFile = "src/main/resources/";
 
-	private static final int numberOfVectorsToCreate = 500;
+	private static final int numberOfVectorsToCreate = 1000;
 	
 	private ImageProcessorZ processor = new ImageProcessorZ();
 
@@ -107,8 +107,7 @@ public class DataCreatorZ {
 			try {
 				result.add(new FeatureVectorZ(processor.createFeatures(new File(path)),concept));
 				} catch (IOException e) {
-					System.out.println("could not read " + path);
-					//ignore
+					i--;
 				}
 		}
 		return result;
