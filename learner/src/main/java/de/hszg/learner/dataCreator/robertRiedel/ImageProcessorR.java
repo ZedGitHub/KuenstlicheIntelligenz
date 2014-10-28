@@ -37,7 +37,7 @@ public class ImageProcessorR
 	 */
 	public ImageProcessorR()
 	{
-
+		// TODO delete stuff for testing
 		// // TODO automated colorscanning from testbmps?
 		String filename = "X0Y0.jpg";
 		// // String filename = "X0Y0.jpg";
@@ -290,10 +290,8 @@ public class ImageProcessorR
 		int symmetrieLinksRechts = getRelation(rotLinks + blauLinks + counterBlack1 + counterBlack3 + counterWhite1 + counterWhite3, rotRechts + blauRechts + counterBlack2 + counterBlack4 + counterWhite2 + counterWhite4);
 		int kernFarbeWeiss = getRelation(counterWhiteCore, (width2core - width1core) * (height2core - height1core));
 		int kernFarbeSchwarz = counterBlackCore;
-		System.out.println("raw values: " + gelb + " " + blauRelationObenUnten + " " + blauRelationLinksRechts + " " + rotRelationObenUnten + " " + rotRelationLinksRechts + " " + symmetrieObenUnten + " " + symmetrieLinksRechts + " " + kernFarbeWeiss + " " + kernFarbeSchwarz);
 		int[] featureInts =
 		{ gelb, blauRelationObenUnten, blauRelationLinksRechts, rotRelationObenUnten, rotRelationLinksRechts, symmetrieObenUnten, symmetrieLinksRechts, kernFarbeWeiss, kernFarbeSchwarz };
-		System.out.println("feature ints " + featureInts[0] + " " + featureInts[1] + " " + featureInts[2] + " " + featureInts[3] + " " + featureInts[4] + " ");
 		return featureInts;
 	}
 
@@ -477,9 +475,28 @@ public class ImageProcessorR
 	private void getColorSpace(Map<Integer, Integer> colorsFound)
 	{
 		int minint = Integer.MIN_VALUE;
+		int minred = 0;
+		int minblue = 0;
+		int mingreen = 0;
+
 		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
 		{
 			Integer value = iterator.next();
+			int red = colorClassifier.getRedFromPixel(value);
+			int green = colorClassifier.getGreenFromPixel(value);
+			int blue = colorClassifier.getBlueFromPixel(value);
+			if (red > minred)
+			{
+				minred = red;
+			}
+			if (blue > minblue)
+			{
+				minblue = blue;
+			}
+			if (green > mingreen)
+			{
+				mingreen = green;
+			}
 			if (value > minint)
 			{
 				minint = value;
@@ -487,9 +504,27 @@ public class ImageProcessorR
 		}
 		System.out.println("min int: " + minint);
 		int maxint = minint;
+		int maxred = minred;
+		int maxblue = minblue;
+		int maxgreen = mingreen;
 		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
 		{
 			Integer value = iterator.next();
+			int red = colorClassifier.getRedFromPixel(value);
+			int green = colorClassifier.getGreenFromPixel(value);
+			int blue = colorClassifier.getBlueFromPixel(value);
+			if (red < maxred)
+			{
+				maxred = red;
+			}
+			if (blue < maxblue)
+			{
+				maxblue = blue;
+			}
+			if (green < maxgreen)
+			{
+				maxgreen = green;
+			}
 			if (value < maxint)
 			{
 				maxint = value;
@@ -502,6 +537,8 @@ public class ImageProcessorR
 
 			// System.out.println("rgb: " + colorClassifier.getRedFromPixel(value) + " " + colorClassifier.getGreenFromPixel(value) + " " + colorClassifier.getBlueFromPixel(value));
 		}
+		System.out.println("min rgb: " + minred + " " + mingreen + " " + minblue);
+		System.out.println("max rgb: " + maxred + " " + maxgreen + " " + maxblue);
 	}
 
 	private Map<Integer, Integer> getColorsPresent(BufferedImage image, int width, int height, Map<Integer, Integer> colorsFound)

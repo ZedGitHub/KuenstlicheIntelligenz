@@ -132,6 +132,9 @@ public class DataCreatorR
 
 	private void writeDataFile(List<FeatureVector> features, String name)
 	{
+		// check if file present and create new, if so
+		
+		
 		try
 		{
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(pathToDataFile + name)));
