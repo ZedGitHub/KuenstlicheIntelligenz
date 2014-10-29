@@ -1,7 +1,6 @@
 package de.hszg.learner;
 
 import java.util.List;
-
 import de.hszg.learner.featureVector.FeatureVector;
 
 
@@ -25,5 +24,4 @@ public class DummyLearner implements Learner {
 		// weil wir nichts gelernt haben glauben wir, alles sind Stopschilder
 		return Concept.Stop;
 	}
-
 }

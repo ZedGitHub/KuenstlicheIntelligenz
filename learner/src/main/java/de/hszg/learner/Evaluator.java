@@ -9,10 +9,6 @@ import java.util.Vector;
 
 import de.hszg.learner.featureVector.FeatureVector;
 
-
-
-
-
 public class Evaluator {
 	/** the percentage (between 0 und 100) of vectors from the data to be used for the test
 	*/
