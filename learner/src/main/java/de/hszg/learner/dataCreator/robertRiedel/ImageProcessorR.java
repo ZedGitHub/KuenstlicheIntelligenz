@@ -49,8 +49,8 @@ public class ImageProcessorR
 
 	public int[] getFeatures(File imageFile) throws IOException
 	{
-		BufferedImage image = ImageIO.read(imageFile);
-		// TODO maybe move sector borders to get more feature diversity
+		BufferedImage RawImage = ImageIO.read(imageFile);
+		BufferedImage image = cutOutlinesFromImage(RawImage);
 		// sectors
 		// 1 2
 		// 3 4
@@ -312,7 +312,6 @@ public class ImageProcessorR
 	{
 		try
 		{
-			// URL sourceUrl = new URL(source);
 			BufferedImage image = ImageIO.read(new File(source));
 			return image;
 		}
@@ -328,57 +327,79 @@ public class ImageProcessorR
 		return image.getRGB(x, y);
 	}
 
-	// private BufferedImage cutOutlinesFromImage(BufferedImage image)
-	// {
-	// int mainColor = getColors(image);
-	// int width = image.getWidth();
-	// int height = image.getHeight();
-	// int horizontalBorder = 0;
-	// int vertikalBorder = 0;
-	// for (int i = 0; i < height; i++)
-	// {
-	// for (int j = 0; j < width; j++)
-	// {
-	// int pixel = image.getRGB(j, i);
-	// if (pixel == mainColor)
-	// {
-	// if (i > horizontalBorder)
-	// {
-	// horizontalBorder = i;
-	// }
-	// if (j > vertikalBorder)
-	// {
-	// vertikalBorder = j;
-	// }
-	// }
-	// }
-	// }
-	// // Graphics2D g2d;
-	// // g2d.drawImage(image, x, y, x + width, y + height, frameX, frameY, frameX + width, frameY + height, this);
-	// // TODO
-	// return image;
-	// }
-
-	private int getColors(BufferedImage image)
+	private BufferedImage cutOutlinesFromImage(BufferedImage image)
 	{
-		// TODO rework logic
-		// TODO just needed for testing
-		// all needed? now just space is used as syso
+		int mainColor = getMostFoundColor(image);
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int topBorder = height;
+		int bottomBorder = 0;
+		int leftBorder = width;
+		int rightBorder = 0;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				int pixel = image.getRGB(j, i);
+				if (pixel != mainColor)
+				{
+					if (i > bottomBorder)
+					{
+						bottomBorder = i;
+					}
+					if (j > rightBorder)
+					{
+						rightBorder = j;
+					}
+				}
+			}
+		}
+		for (int i = height - 1; i > 0; i--)
+		{
+			for (int j = width - 1; j > 0; j--)
+			{
+				int pixel = 0;
+				try
+				{
+					pixel = image.getRGB(j, i);
+
+				}
+				catch (Exception e)
+				{
+					System.out.println("exception: i: " + i + " j: " + j);
+					e.printStackTrace();
+				}
+				if (pixel != mainColor)
+				{
+					if (i < topBorder)
+					{
+						topBorder = i;
+					}
+					if (j < leftBorder)
+					{
+						leftBorder = j;
+					}
+				}
+			}
+		}
+		System.out.println("cut borders: " + " " + topBorder + " " + bottomBorder + " " + leftBorder + " " + rightBorder);
+		// Graphics2D g2d;
+		// g2d.drawImage(image, x, y, x + width, y + height, frameX, frameY, frameX + width, frameY + height, this);
+		// TODO
+		return image;
+	}
+
+	private int getMostFoundColor(BufferedImage image)
+	{
 		int surroundingColor = 0;
-		int surroundingColor2 = 0;
 		int width = image.getWidth();
 		int height = image.getHeight();
 		Map<Integer, Integer> colorsFound = new HashMap<Integer, Integer>();
 		colorsFound = getColorsPresent(image, width, height, colorsFound);
-
 		int maxAmount = 0;
-		maxAmount = getMostFoundColor(colorsFound, maxAmount);
-		int minAmount = 0;
-		getColorSpace(colorsFound);
+		// most found color has to be the surrounding color in an untrimmed image
+		maxAmount = getMostFoundColorValue(colorsFound, maxAmount);
 		surroundingColor = getKeyOfFoundColor(surroundingColor, colorsFound, maxAmount);
-		surroundingColor2 = getKeyOfFoundColor(surroundingColor2, colorsFound, minAmount);
-		System.out.println("chose surrounding color1(as int) " + surroundingColor + " with " + maxAmount + " pixel");
-		System.out.println("chose surrounding color2(as int) " + surroundingColor2 + " with " + minAmount + " pixel");
 		return surroundingColor;
 	}
 
@@ -395,7 +416,7 @@ public class ImageProcessorR
 		return surroundingColor;
 	}
 
-	private int getMostFoundColor(Map<Integer, Integer> colorsFound, int maxAmount)
+	private int getMostFoundColorValue(Map<Integer, Integer> colorsFound, int maxAmount)
 	{
 		for (Iterator<Integer> iterator = colorsFound.values().iterator(); iterator.hasNext();)
 		{
@@ -550,7 +571,17 @@ public class ImageProcessorR
 
 	public static void main(String[] args)
 	{
-		new ImageProcessorR();
+		ImageProcessorR processor = new ImageProcessorR();
+		File imageFile = new File("F:\\306 - Vorfahrtsstrße\\0\\3500\\X0Y0.jpg");
+		try
+		{
+			processor.getFeatures(imageFile);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
