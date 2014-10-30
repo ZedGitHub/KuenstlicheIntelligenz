@@ -21,6 +21,9 @@ public class ImageProcessorR
 	String				folderNameRechtsAbbiegen	= "";
 	String				folderNameLinksAbbiegen		= "209 - Fahrtrichtung links";
 	String				folderNameVorfahrtsstrasse	= "306 - Vorfahrtsstrße";
+	int					widthDivider;
+	int					heightDivider;
+	int					coreDivider;
 
 	ColorClassifierR	colorClassifier;
 
@@ -32,21 +35,30 @@ public class ImageProcessorR
 	 */
 	public ImageProcessorR()
 	{
+		this(2, 2, 8);
+	}
+
+	public ImageProcessorR(int widthDivider, int heightDivider, int coreDivider)
+	{
 		colorClassifier = new ColorClassifierR();
+		this.heightDivider = heightDivider;
+		this.widthDivider = widthDivider;
+		this.coreDivider = coreDivider;
+
 	}
 
 	public int[] getFeatures(File imageFile) throws IOException
 	{
 		BufferedImage image = ImageIO.read(imageFile);
-
+		// TODO maybe move sector borders to get more feature diversity
 		// sectors
 		// 1 2
 		// 3 4
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int imgSize = width * height;
-		int halfWidth = width / 2;
-		int halfHeigth = height / 2;
+		int halfWidth = width / widthDivider;
+		int halfHeigth = height / heightDivider;
 		int width1Sector1 = 0;
 		int width2Sector1 = halfWidth;
 		int height1Sector1 = 0;
@@ -63,10 +75,10 @@ public class ImageProcessorR
 		int width2Sector4 = width;
 		int height1Sector4 = halfHeigth;
 		int height2Sector4 = height;
-		int width1core = halfWidth - width / 8;
-		int width2core = halfWidth + width / 8;
-		int height1core = halfHeigth - height / 8;
-		int height2core = halfHeigth + height / 8;
+		int width1core = (width / 2) - (width / coreDivider);
+		int width2core = (width / 2) + (width / coreDivider);
+		int height1core = (height / 2) - (height / coreDivider);
+		int height2core = (height / 2) + (height / coreDivider);
 		int counterNone = 0;
 		int counterRed1 = 0;
 		int counterRed2 = 0;
