@@ -4,6 +4,7 @@ import de.hszg.learner.Concept;
 import de.hszg.learner.Learner;
 import de.hszg.learner.SingleLayerArtificialNeuronalNetwork;
 import de.hszg.learner.featureVector.FeatureVector;
+import de.hszg.learner.featureVector.zed.FeatureVectorZ;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,9 +12,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 
 public class EvaluatorDaniel {
@@ -24,22 +23,22 @@ public class EvaluatorDaniel {
 
 	public EvaluatorDaniel(String filename) {
         int i = 0;
-        int numberOfTests = 100000;
+        int numberOfTests = 1000;
 
 		List<FeatureVector> vectors = readData(filename);
-		
-		Learner learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures());
-		
-		float success = 0;
+
+        vectors.forEach(System.out::println);
+
+        float success = 0;
         float unknown = 0;
         float wrong = 0;
 
 
-		// TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
-		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
-		// wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
-		do{
-            learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures()); //if the initialization isn't made each time the evaluation is the same every time, hoping that this is a problem which only occurs since we haven't enough data
+        // TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
+        // Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
+        // wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
+        do{
+            Learner learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures());
 
 			vectors = mixData(vectors);
 			List<List<FeatureVector>> sets = extractTrainingData(vectors);
@@ -65,7 +64,7 @@ public class EvaluatorDaniel {
 	 */
 	private void evalResult(Vector<Integer> result) {
 		// TODO hier muss mehr Auswertung passieren, insbes: Vertrauensintervalle etc
-		System.out.println("Learning result: \n correct: "+result.get(0)+"\n unknown: "+result.get(1)+"\n wrong: "+result.get(2));
+//		System.out.println("Learning result: \n correct: "+result.get(0)+"\n unknown: "+result.get(1)+"\n wrong: "+result.get(2));
 	}
 	/** evaluate the learner with a given test set. 
 	 * 
@@ -97,6 +96,10 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
  */
 	private List<FeatureVector> mixData(List<FeatureVector> vectors) {
 		// TODO: die Reihenfolge der Elemente zuf�llig ver�ndern
+
+        long seed = System.nanoTime();
+        Collections.shuffle(vectors, new Random(seed));
+
 		return vectors;
 	}
 
@@ -157,7 +160,7 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		new Evaluator(filename);*/
 
 
-        URL url = EvaluatorDaniel.class.getResource("/zDummyData.dat");
+        URL url = EvaluatorDaniel.class.getResource("/zdata.dat");
 
         File file = null;
         try {
