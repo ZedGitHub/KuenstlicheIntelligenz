@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,14 +32,14 @@ public class EvaluatorMaria {
 	private ArrayList<Double> means = new ArrayList<>();
 	
 	public EvaluatorMaria(String filename) {
-		List<FeatureVector> vectors = readData(filename); //Robert
+		List<FeatureVector> vectors = readData(filename); 
 		
 		Learner learner = new DummyLearner();
 		
 		int i=0;
-		// TODO: folgendes muss zur Evaluierung mehrfach ausgef�hrt werden
+		// TODO: folgendes muss zur Evaluierung mehrfach ausgefuehrt werden
 		// Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
-		// wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
+		// wie oft, das haengt vom gewuenschten Vertrauensintervall ab
 		do{
 			vectors = mixData(vectors);
 			List<List<FeatureVector>> sets = extractTrainingData(vectors);
@@ -47,12 +48,13 @@ public class EvaluatorMaria {
 			evalResult(result);
 			i++;
 		}while(i<101); //TODO: eine andere Abbruchbedingung verwenden
+		
 		double sum =0; 
 		for (Double d : means)
 		{
 			sum+=d;
 		}
-		System.out.println("Im Durchnitt " + (sum/means.size())*100+"% Richtig");
+		System.out.println("Im Durchnitt "+ (sum/means.size())+"% Richtig");
 		
 		SummaryStatistics stats = new SummaryStatistics();
 	        for (double val : means) {
@@ -87,6 +89,7 @@ private static double calcMeanCI(SummaryStatistics stats, double level) {
 	 */
 	private void evalResult(Vector<Integer> result) {
 		// TODO hier muss mehr Auswertung passieren, insbes: Vertrauensintervalle etc
+		
 		float sum=result.get(0)+result.get(1)+result.get(2); //sume
 		means.add((double) ((result.get(0)/sum)*100));//habe ein Liste wo der richten sind (%)
 		
@@ -124,7 +127,7 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
  * (usually) in different order
  */
 	private List<FeatureVector> mixData(List<FeatureVector> vectors) {
-		// TODO: die Reihenfolge der Elemente zuf�llig ver�ndern
+		// TODO: die Reihenfolge der Elemente zufaellig veraendern
 		
 		long seed = System.nanoTime();
 		Collections.shuffle(vectors, new Random(seed));
@@ -184,18 +187,28 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 		
 		File file = null;
 		
+		try {
+            file = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+		
 		/*String filename=null;
 		if(args.length==0){
 			System.out.println("No data file provided, using dummy data: DummyData.dat");
 			filename = "DummyData.dat";
 		}
 		else 
-			filename = args[0];
-		new Evaluator(filename);*/
+			filename = args[0];*/
+		new EvaluatorMaria(file.getAbsolutePath());
 		
 			
 	}
 }
+
+
+
+
 
 
 
