@@ -14,9 +14,18 @@ public class Id3 implements Learner {
 	private Node root;
 	private int numberOfVector = 0;
 	private int numberOfAttribute = 0;
+	private double backup[];
 	private int featureValue = 0;
+	private double save[];
+	private double globalrange[];
+	private double gloabelMaxValue[];
+	private boolean classify = false;
 	
-	public double calcEntropy(List<FeatureVector> trainingSet){
+	public Id3(){
+	
+	}
+	
+	public List<FeatureVectorR> calcEntropy(List<FeatureVectorR> trainingSet){
 
 		double linksAbbigen = 0;
 		double rechtsAbbiegen = 0;
@@ -83,19 +92,116 @@ public class Id3 implements Learner {
 		
 		double result = (-1*linksAbbigen) - rechtsAbbiegen - stop - vorfahrtGewaehren - vorfahrtstrasse - vorfahrtVonRechts - unbekannt;
 		
-		return result;
-	}
-	
-	public double calcInfoGain(){
 		
-		return 0;
+		double gainArr[] = new double[trainingSet.get(0).getNumFeatures()];
+		
+		for(int i = 0; i < trainingSet.get(0).getNumFeatures(); i++){
+			
+		double one = 0;
+		double two = 0;
+		double three = 0;
+		double four = 0;
+		double temp = 0;
+		double all = 0;
+		double gain = 0;
+			
+			for(int j = 0; j < trainingSet.size(); j++){
+				
+				if(trainingSet.get(j).getFeatureValue(i) == 1){
+					
+					one++;
+				}
+				else if(trainingSet.get(j).getFeatureValue(i) == 2){
+					
+					two++;
+				}
+				else if(trainingSet.get(j).getFeatureValue(i) == 3){
+					
+					three++;
+				}
+				else if(trainingSet.get(j).getFeatureValue(i) == 4){
+					
+					four++;
+				}
+			}
+			
+			all = one + two + three + four;
+			
+			double tempOne = 0;
+			double tempTwo = 0;
+			double tempThree = 0;
+			double tempFour = 0;
+			
+			double onetemp = 0;
+			double twotemp = 0;
+			double threetemp = 0;
+			double fourtemp = 0;
+			
+			if(all > 0){
+				onetemp = one/all;
+				twotemp = two/all;
+				threetemp = three/all;
+				fourtemp = four/all;
+			}
+			
+			if(onetemp > 0){
+				tempOne = (one/all) * (Math.log(one/all)/Math.log(2));
+			}
+			if(twotemp > 0){
+				tempTwo = (two/all) * (Math.log(two/all)/Math.log(2));
+			}
+			if(threetemp > 0){
+				tempThree = (three/all) * (Math.log(three/all)/Math.log(2));
+			}
+			if(fourtemp > 0){
+				tempFour = (four/all) * (Math.log(four/all)/Math.log(2));
+			}
+			
+			temp = tempOne + tempTwo + tempThree + tempFour;
+			gain = result - temp;
+			gainArr[i] = gain;
+		}
+		
+		save = new double[gainArr.length];
+		
+		for(int z = 0; z < gainArr.length; z++){
+			
+			save[z] = gainArr[z];
+		}
+		
+		boolean swapped = true;
+	    int j = 0;
+	    double tmp;
+	    int real;
+	    while (swapped) {
+	        swapped = false;
+	        j++;
+	        for (int i = 0; i < gainArr.length - j; i++) {
+	            if (gainArr[i] > gainArr[i + 1]) {
+	            	
+	            	for(int x = 0; x < trainingSet.size(); x++){
+	            		tmp = gainArr[i];
+	            		real = trainingSet.get(x).getFeatureValue(i);
+	            		
+	            		gainArr[i] = gainArr[i + 1];
+	            		trainingSet.get(x).setFeature(i, trainingSet.get(x).getFeatureValue(i + 1));
+	            		
+	            		gainArr[i + 1] = tmp;
+	            		trainingSet.get(x).setFeature(i + 1, real);
+	            		
+	                swapped = true;
+	            	}
+	            }
+	        }
+	    }
+	    
+		return trainingSet;
 	}
 	
 	public List<FeatureVectorR> normalizeVectorList(List<FeatureVector> trainingSet){
 		
 		int[][] arr = new int[trainingSet.size()][trainingSet.get(0).getNumFeatures()];
 		List<FeatureVectorR> fvrList = new LinkedList<FeatureVectorR>();
-		double range = 0;
 		
 		for(int i = 0; i < trainingSet.size(); i++){
 			
@@ -105,37 +211,54 @@ public class Id3 implements Learner {
 			}
 		}
 		
-		int maxValue = 0;
-		
 		for(int i = 0; i < trainingSet.get(0).getNumFeatures(); i++){
 			
-			maxValue = 0;
+			if( gloabelMaxValue == null){
+				gloabelMaxValue = new double[trainingSet.get(0).getNumFeatures()];
 			
-			for (int j = 0; j < trainingSet.size(); j++){
-				
-				if(maxValue < arr[j][i]){
+			}
+			if(classify == false){
+				for (int j = 0; j < trainingSet.size(); j++){
 					
-					maxValue = arr[j][i];
+					if(gloabelMaxValue[i] < arr[j][i]){
+						
+						gloabelMaxValue[i] = arr[j][i];
+					}
 				}
 			}
 			
 			for (int j = 0; j < trainingSet.size(); j++){
 				
-				range = maxValue/4;
-				
-				if(arr[j][i] > 4){
+				if(globalrange == null){
+					globalrange = new double[trainingSet.get(0).getNumFeatures()];
+				}
 					
-					if(arr[j][i] >= 0 && arr[j][i] < range){
+				if(classify == false){
+					globalrange[i] = gloabelMaxValue[i]/7.0;
+				}
+				
+				if(gloabelMaxValue[i] > 7){
+					
+					if(arr[j][i] >= 0 && arr[j][i] < globalrange[i]){
 						arr[j][i] = 1;
 					}
-					else if(arr[j][i] >= range && arr[j][i] < (range*2)){
+					else if(arr[j][i] >= globalrange[i] && arr[j][i] < (globalrange[i]*2)){
 						arr[j][i] = 2;
 					}
-					else if(arr[j][i] >= (range*2) && arr[j][i] < (range*3)){
+					else if(arr[j][i] >= (globalrange[i]*2) && arr[j][i] < (globalrange[i]*3)){
 						arr[j][i] = 3;
 					}
-					else{
+					else if(arr[j][i] >= (globalrange[i]*3) && arr[j][i] < (globalrange[i]*4)){
 						arr[j][i] = 4;
+					}
+					else if(arr[j][i] >= (globalrange[i]*4) && arr[j][i] < (globalrange[i]*5)){
+						arr[j][i] = 5;
+					}
+					else if(arr[j][i] >= (globalrange[i]*5) && arr[j][i] < (globalrange[i]*6)){
+						arr[j][i] = 6;
+					}
+					else{
+						arr[j][i] = 7;
 					}	
 				}
 			}
@@ -152,10 +275,6 @@ public class Id3 implements Learner {
 			}
 			
 			fvrList.add(fvr);
-			
-			for(int x = 0; x < fvr.getNumFeatures(); x++){
-				System.out.println(fvr.getFeatureValue(x));
-			}
 		}
 		
 		return fvrList;
@@ -176,14 +295,11 @@ public class Id3 implements Learner {
 				}
 				for(int i = 0; i <= j; i++){
 					
-					//exisitiert bereits die Kante
 					if(!node.getChildren().isEmpty()){
 						if(node.getChildren().get(i).getEdge() == trainingSet.get(numberOfVector).getFeatureValue(numberOfAttribute)){
 							
-							//letztes Attribut um Vektor erreicht --> Blatt // gehen zum nächsten Vektor
 							if(numberOfAttribute == trainingSet.get(numberOfVector).getNumFeatures()){
 								node.getChildren().get(i).setConcept(trainingSet.get(numberOfVector).getConcept());
-								System.out.println("SET LEAF " + trainingSet.get(numberOfVector).getConcept() );
 								numberOfVector++;
 								numberOfAttribute = 0;
 								
@@ -197,7 +313,6 @@ public class Id3 implements Learner {
 						}
 						if(numberOfAttribute == trainingSet.get(numberOfVector).getNumFeatures()){
 							node.setConcept(trainingSet.get(numberOfVector).getConcept());
-							System.out.println("SET LEAF " + trainingSet.get(numberOfVector).getConcept() );
 							numberOfVector++;
 							numberOfAttribute = 0;
 							
@@ -206,7 +321,6 @@ public class Id3 implements Learner {
 						else{
 							Node temp = new Node(node, trainingSet.get(numberOfVector).getFeatureValue(numberOfAttribute), null);
 							node.setChildren(temp);
-							System.out.println("SET NEW CHILD " +  trainingSet.get(numberOfVector).getFeatureValue(numberOfAttribute));
 							numberOfAttribute++;
 							return createTree(temp, trainingSet);
 						}
@@ -214,7 +328,6 @@ public class Id3 implements Learner {
 					else{
 						if(numberOfAttribute == trainingSet.get(numberOfVector).getNumFeatures()){
 							node.setConcept(trainingSet.get(numberOfVector).getConcept());
-							System.out.println("SET LEAF " + trainingSet.get(numberOfVector).getConcept() );
 							numberOfVector++;
 							numberOfAttribute = 0;
 							
@@ -223,7 +336,6 @@ public class Id3 implements Learner {
 						else{
 							Node temp = new Node(node, trainingSet.get(numberOfVector).getFeatureValue(numberOfAttribute), null);
 							node.setChildren(temp);
-							System.out.println("SET NEW CHILD " +  trainingSet.get(numberOfVector).getFeatureValue(numberOfAttribute));
 							numberOfAttribute++;
 							return createTree(temp, trainingSet);
 						}
@@ -234,7 +346,7 @@ public class Id3 implements Learner {
 		return null;
 	}
 	
-	public Concept classifyVector(Node node, FeatureVector example){
+	public Concept classifyVector(Node node, FeatureVectorR example){
 		
 		for(int i = 0; i < node.getChildren().size(); i++){
 			
@@ -255,42 +367,92 @@ public class Id3 implements Learner {
 		return Concept.Unknown;
 	}
 	
+	/*
+	 * Main for Testing
+	 
+	
 	public static void main(String args[]){
 		
-		FeatureVector[] f = new FeatureVector[2];
-		f[0] = new DummyFeatureVector(1,40,40,Concept.VorfahrtGewaehren);
-		f[1] = new DummyFeatureVector(1,80,40,Concept.Unknown);
-		/*
-		f[2] = new DummyFeatureVector(60,5,6,Concept.Vorfahrtsstrasse);
-		f[3] = new DummyFeatureVector(1,5,3,Concept.RechtsAbbiegen);
-		f[4] = new DummyFeatureVector(66,2,3,Concept.Stop);
-		f[5] = new DummyFeatureVector(66,3,1,Concept.LinksAbbiegen);
-		f[6] = new DummyFeatureVector(66,4,1,Concept.VorfahrtVonRechts);
-		*/
+		FeatureVector[] f = new FeatureVector[3];
+	
+		f[2] = new DummyFeatureVector(33,22,11,Concept.VorfahrtGewaehren);
+		f[0] = new DummyFeatureVector(20,5,2,Concept.LinksAbbiegen);
+		f[1] = new DummyFeatureVector(80,20,20,Concept.Stop);
+		
 		List<FeatureVector> res = new LinkedList<>();
 		for(FeatureVector fv : f) res.add(fv);
 		
 		Id3 id3 = new Id3();
 		id3.learn(res);
 		
-		DummyFeatureVector test = new DummyFeatureVector(66,5,6,Concept.Stop);
+		DummyFeatureVector test = new DummyFeatureVector(20,5,2,Concept.Stop);
 		id3.classify(test);
+		DummyFeatureVector test2 = new DummyFeatureVector(20,5,2,Concept.Stop);
+		id3.classify(test2);
+		DummyFeatureVector test3 = new DummyFeatureVector(68,20,20,Concept.Stop);
+		id3.classify(test3);
 	}
+	
+	*/
+
 
 	@Override
 	public void learn(List<FeatureVector> trainingSet) {
 		
 		root = new Node(null, 999, null);
-		System.out.println("SET ROOT");
-		//System.out.println(calcEntropy(trainingSet));
-		createTree(root, normalizeVectorList(trainingSet));
+		System.out.println("ID3 learn...");
+		this.classify = false;
+		createTree(root, calcEntropy(normalizeVectorList(trainingSet)));
 	}
 
 	@Override
 	public Concept classify(FeatureVector example) {
-
-		return classifyVector(root, example);
+		
+		System.out.println("ID3 classify...");
+		this.classify = true;
+		
+		List<FeatureVector> list = new LinkedList<FeatureVector>();
+		list.add(example);
+		FeatureVectorR fvr = normalizeVectorList(list).get(0);
+		
+		if(save != null){
+		
+			backup = new double[save.length];
+			
+			for(int z = 0; z < save.length; z++){
+				backup[z] = save[z];
+			}
+			
+			boolean swapped = true;
+		    int j = 0;
+		    double tmp;
+		    int real;
+		    while (swapped) {
+		        swapped = false;
+		        j++;
+		        for (int i = 0; i < save.length - j; i++) {
+		            if (save[i] > save[i + 1]) {
+		            	
+		            		tmp = save[i];
+		            		real = fvr.getFeatureValue(i);
+		            		
+		            		save[i] = save[i + 1];
+		            		fvr.setFeature(i, fvr.getFeatureValue(i + 1));
+		            		
+		            		save[i + 1] = tmp;
+		            		fvr.setFeature(i + 1, real);
+		            		
+		                swapped = true;
+		            }
+		        }
+		    }
+		    for(int z = 0; z < backup.length; z++){
+				
+				save[z] = backup[z];
+			}
+		}
+	    featureValue = 0;
+		
+		return classifyVector(root, fvr);
 	}
-
-
 }
