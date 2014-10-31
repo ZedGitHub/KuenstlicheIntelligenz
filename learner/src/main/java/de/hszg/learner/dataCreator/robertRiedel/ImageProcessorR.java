@@ -3,16 +3,11 @@ package de.hszg.learner.dataCreator.robertRiedel;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-
-import de.hszg.learner.Concept;
-import de.hszg.learner.featureVector.robertRiedel.FeatureVectorR;
 
 /**
  * for all stuff done with the images to make a feature vector
@@ -26,8 +21,11 @@ public class ImageProcessorR
 	String				folderNameRechtsAbbiegen	= "";
 	String				folderNameLinksAbbiegen		= "209 - Fahrtrichtung links";
 	String				folderNameVorfahrtsstrasse	= "306 - Vorfahrtsstrße";
+	int					widthDivider;
+	int					heightDivider;
+	int					coreDivider;
 
-	ColorClassifierR	colorClassifier				= new ColorClassifierR();
+	ColorClassifierR	colorClassifier;
 
 	/**
 	 * get an image from specified source
@@ -37,41 +35,30 @@ public class ImageProcessorR
 	 */
 	public ImageProcessorR()
 	{
+		this(2, 2, 8);
+	}
 
-		// // TODO automated colorscanning from testbmps?
-		String filename = "X0Y0.jpg";
-		// // String filename = "X0Y0.jpg";
-		String source = rootPathToSigns + "\\" + folderNameVorfahrtGewaehren + "\\0\\3500\\" + filename;
-		// // String source = "C:\\Studium\\Künstliche Intelligenz\\farbTestWeiss.bmp";
-		BufferedImage image = getImageFromSource(source);
-		// getColors(image);
-		String testSource = "C:\\Studium\\Künstliche Intelligenz\\farbTestBlau.bmp";
-		BufferedImage testImage = getImageFromSource(testSource);
-		getColors(testImage);
-		int value = -12747347;
-		System.out.println("rgb: " + colorClassifier.getRedFromPixel(value) + " " + colorClassifier.getGreenFromPixel(value) + " " + colorClassifier.getBlueFromPixel(value));
-		testColorCount(testImage);
-		testColorCount(image);
-		// // getSurroundingColor(testImage);
-		// int[] features = getFeatures(image);
-		// Concept d = Concept.Stop;
-		// FeatureVectorR TestFv = new FeatureVectorR(features, d);
-		// System.out.println(TestFv);
-		// System.out.println("done");
+	public ImageProcessorR(int widthDivider, int heightDivider, int coreDivider)
+	{
+		colorClassifier = new ColorClassifierR();
+		this.heightDivider = heightDivider;
+		this.widthDivider = widthDivider;
+		this.coreDivider = coreDivider;
+
 	}
 
 	public int[] getFeatures(File imageFile) throws IOException
 	{
-		BufferedImage image = ImageIO.read(imageFile);
-
+		BufferedImage RawImage = ImageIO.read(imageFile);
+		BufferedImage image = cutOutlinesFromImage(RawImage);
 		// sectors
 		// 1 2
 		// 3 4
 		int width = image.getWidth();
 		int height = image.getHeight();
 		int imgSize = width * height;
-		int halfWidth = width / 2;
-		int halfHeigth = height / 2;
+		int halfWidth = width / widthDivider;
+		int halfHeigth = height / heightDivider;
 		int width1Sector1 = 0;
 		int width2Sector1 = halfWidth;
 		int height1Sector1 = 0;
@@ -88,10 +75,10 @@ public class ImageProcessorR
 		int width2Sector4 = width;
 		int height1Sector4 = halfHeigth;
 		int height2Sector4 = height;
-		int width1core = halfWidth - width / 8;
-		int width2core = halfWidth + width / 8;
-		int height1core = halfHeigth - height / 8;
-		int height2core = halfHeigth + height / 8;
+		int width1core = (width / 2) - (width / coreDivider);
+		int width2core = (width / 2) + (width / coreDivider);
+		int height1core = (height / 2) - (height / coreDivider);
+		int height2core = (height / 2) + (height / coreDivider);
 		int counterNone = 0;
 		int counterRed1 = 0;
 		int counterRed2 = 0;
@@ -273,7 +260,7 @@ public class ImageProcessorR
 				}
 			}
 		}
-		int gelb = colorClassifier.getColorTrue(counterYellow1 + counterYellow2 + counterYellow3 + counterYellow4 + counterYellowCore);
+		int gelb = colorClassifier.getColorTrue(counterYellow1 + counterYellow2 + counterYellow3 + counterYellow4 + counterYellowCore, imgSize);
 		int blauLinks = counterBlue1 + counterBlue3;
 		int blauRechts = counterBlue2 + counterBlue4;
 		int blauRelationLinksRechts = getRelation(blauLinks, blauRechts);
@@ -290,10 +277,8 @@ public class ImageProcessorR
 		int symmetrieLinksRechts = getRelation(rotLinks + blauLinks + counterBlack1 + counterBlack3 + counterWhite1 + counterWhite3, rotRechts + blauRechts + counterBlack2 + counterBlack4 + counterWhite2 + counterWhite4);
 		int kernFarbeWeiss = getRelation(counterWhiteCore, (width2core - width1core) * (height2core - height1core));
 		int kernFarbeSchwarz = counterBlackCore;
-		System.out.println("raw values: " + gelb + " " + blauRelationObenUnten + " " + blauRelationLinksRechts + " " + rotRelationObenUnten + " " + rotRelationLinksRechts + " " + symmetrieObenUnten + " " + symmetrieLinksRechts + " " + kernFarbeWeiss + " " + kernFarbeSchwarz);
 		int[] featureInts =
 		{ gelb, blauRelationObenUnten, blauRelationLinksRechts, rotRelationObenUnten, rotRelationLinksRechts, symmetrieObenUnten, symmetrieLinksRechts, kernFarbeWeiss, kernFarbeSchwarz };
-		System.out.println("feature ints " + featureInts[0] + " " + featureInts[1] + " " + featureInts[2] + " " + featureInts[3] + " " + featureInts[4] + " ");
 		return featureInts;
 	}
 
@@ -310,8 +295,8 @@ public class ImageProcessorR
 			else
 			{
 				result = ((double) divisor / (double) dividend);
-				System.out.println("groesser: " + result);
 				result = 100 - (result * 100);
+				System.out.println("groesser: " + result + " " + divisor + " " + dividend);
 			}
 		}
 		catch (Exception e)
@@ -327,7 +312,6 @@ public class ImageProcessorR
 	{
 		try
 		{
-			// URL sourceUrl = new URL(source);
 			BufferedImage image = ImageIO.read(new File(source));
 			return image;
 		}
@@ -343,57 +327,79 @@ public class ImageProcessorR
 		return image.getRGB(x, y);
 	}
 
-	// private BufferedImage cutOutlinesFromImage(BufferedImage image)
-	// {
-	// int mainColor = getColors(image);
-	// int width = image.getWidth();
-	// int height = image.getHeight();
-	// int horizontalBorder = 0;
-	// int vertikalBorder = 0;
-	// for (int i = 0; i < height; i++)
-	// {
-	// for (int j = 0; j < width; j++)
-	// {
-	// int pixel = image.getRGB(j, i);
-	// if (pixel == mainColor)
-	// {
-	// if (i > horizontalBorder)
-	// {
-	// horizontalBorder = i;
-	// }
-	// if (j > vertikalBorder)
-	// {
-	// vertikalBorder = j;
-	// }
-	// }
-	// }
-	// }
-	// // Graphics2D g2d;
-	// // g2d.drawImage(image, x, y, x + width, y + height, frameX, frameY, frameX + width, frameY + height, this);
-	// // TODO
-	// return image;
-	// }
-
-	private int getColors(BufferedImage image)
+	private BufferedImage cutOutlinesFromImage(BufferedImage image)
 	{
-		// TODO rework logic
-		// TODO just needed for testing
-		// all needed? now just space is used as syso
+		int mainColor = getMostFoundColor(image);
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int topBorder = height;
+		int bottomBorder = 0;
+		int leftBorder = width;
+		int rightBorder = 0;
+		for (int i = 0; i < height; i++)
+		{
+			for (int j = 0; j < width; j++)
+			{
+				int pixel = image.getRGB(j, i);
+				if (pixel != mainColor)
+				{
+					if (i > bottomBorder)
+					{
+						bottomBorder = i;
+					}
+					if (j > rightBorder)
+					{
+						rightBorder = j;
+					}
+				}
+			}
+		}
+		for (int i = height - 1; i > 0; i--)
+		{
+			for (int j = width - 1; j > 0; j--)
+			{
+				int pixel = 0;
+				try
+				{
+					pixel = image.getRGB(j, i);
+
+				}
+				catch (Exception e)
+				{
+					System.out.println("exception: i: " + i + " j: " + j);
+					e.printStackTrace();
+				}
+				if (pixel != mainColor)
+				{
+					if (i < topBorder)
+					{
+						topBorder = i;
+					}
+					if (j < leftBorder)
+					{
+						leftBorder = j;
+					}
+				}
+			}
+		}
+		System.out.println("cut borders: " + " " + topBorder + " " + bottomBorder + " " + leftBorder + " " + rightBorder);
+		// Graphics2D g2d;
+		// g2d.drawImage(image, x, y, x + width, y + height, frameX, frameY, frameX + width, frameY + height, this);
+		// TODO
+		return image;
+	}
+
+	private int getMostFoundColor(BufferedImage image)
+	{
 		int surroundingColor = 0;
-		int surroundingColor2 = 0;
 		int width = image.getWidth();
 		int height = image.getHeight();
 		Map<Integer, Integer> colorsFound = new HashMap<Integer, Integer>();
 		colorsFound = getColorsPresent(image, width, height, colorsFound);
-
 		int maxAmount = 0;
-		maxAmount = getMostFoundColor(colorsFound, maxAmount);
-		int minAmount = 0;
-		getColorSpace(colorsFound);
+		// most found color has to be the surrounding color in an untrimmed image
+		maxAmount = getMostFoundColorValue(colorsFound, maxAmount);
 		surroundingColor = getKeyOfFoundColor(surroundingColor, colorsFound, maxAmount);
-		surroundingColor2 = getKeyOfFoundColor(surroundingColor2, colorsFound, minAmount);
-		System.out.println("chose surrounding color1(as int) " + surroundingColor + " with " + maxAmount + " pixel");
-		System.out.println("chose surrounding color2(as int) " + surroundingColor2 + " with " + minAmount + " pixel");
 		return surroundingColor;
 	}
 
@@ -410,7 +416,7 @@ public class ImageProcessorR
 		return surroundingColor;
 	}
 
-	private int getMostFoundColor(Map<Integer, Integer> colorsFound, int maxAmount)
+	private int getMostFoundColorValue(Map<Integer, Integer> colorsFound, int maxAmount)
 	{
 		for (Iterator<Integer> iterator = colorsFound.values().iterator(); iterator.hasNext();)
 		{
@@ -477,31 +483,68 @@ public class ImageProcessorR
 	private void getColorSpace(Map<Integer, Integer> colorsFound)
 	{
 		int minint = Integer.MIN_VALUE;
+		int minred = 0;
+		int minblue = 0;
+		int mingreen = 0;
+
 		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
 		{
 			Integer value = iterator.next();
+			int red = colorClassifier.getRedFromPixel(value);
+			int green = colorClassifier.getGreenFromPixel(value);
+			int blue = colorClassifier.getBlueFromPixel(value);
+			if (red > minred)
+			{
+				minred = red;
+			}
+			if (blue > minblue)
+			{
+				minblue = blue;
+			}
+			if (green > mingreen)
+			{
+				mingreen = green;
+			}
 			if (value > minint)
 			{
 				minint = value;
 			}
 		}
 		System.out.println("min int: " + minint);
+		System.out.println("min int rgb: " + colorClassifier.getRedFromPixel(minint) + " " + colorClassifier.getGreenFromPixel(minint) + " " + colorClassifier.getBlueFromPixel(minint));
+
 		int maxint = minint;
+		int maxred = minred;
+		int maxblue = minblue;
+		int maxgreen = mingreen;
 		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
 		{
 			Integer value = iterator.next();
+			int red = colorClassifier.getRedFromPixel(value);
+			int green = colorClassifier.getGreenFromPixel(value);
+			int blue = colorClassifier.getBlueFromPixel(value);
+			if (red < maxred)
+			{
+				maxred = red;
+			}
+			if (blue < maxblue)
+			{
+				maxblue = blue;
+			}
+			if (green < maxgreen)
+			{
+				maxgreen = green;
+			}
 			if (value < maxint)
 			{
 				maxint = value;
 			}
 		}
 		System.out.println("max int: " + maxint);
-		for (Iterator<Integer> iterator = colorsFound.keySet().iterator(); iterator.hasNext();)
-		{
-			Integer value = iterator.next();
+		System.out.println("max int rgb: " + colorClassifier.getRedFromPixel(maxint) + " " + colorClassifier.getGreenFromPixel(maxint) + " " + colorClassifier.getBlueFromPixel(maxint));
 
-			// System.out.println("rgb: " + colorClassifier.getRedFromPixel(value) + " " + colorClassifier.getGreenFromPixel(value) + " " + colorClassifier.getBlueFromPixel(value));
-		}
+		System.out.println("min rgb: " + minred + " " + mingreen + " " + minblue);
+		System.out.println("max rgb: " + maxred + " " + maxgreen + " " + maxblue);
 	}
 
 	private Map<Integer, Integer> getColorsPresent(BufferedImage image, int width, int height, Map<Integer, Integer> colorsFound)
@@ -528,7 +571,17 @@ public class ImageProcessorR
 
 	public static void main(String[] args)
 	{
-		new ImageProcessorR();
+		ImageProcessorR processor = new ImageProcessorR();
+		File imageFile = new File("F:\\306 - Vorfahrtsstrße\\0\\3500\\X0Y0.jpg");
+		try
+		{
+			processor.getFeatures(imageFile);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

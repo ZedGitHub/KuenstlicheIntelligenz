@@ -35,10 +35,12 @@ public class DataCreatorR
 	private static final String	directoryVorfahrtsstrasse	= "Vorfahrtsstrasse/";
 
 	private static final int	numberOfVectorsToCreate		= 500;										// of EACH concept
-	private ImageProcessorR		processor					= new ImageProcessorR();
+	private ImageProcessorR		processor;
 
 	public DataCreatorR()
 	{
+		// set arguments to determine the sectoring of the image
+		this.processor = new ImageProcessorR(4, 4, 10);
 		writeDataFile(createRandomData(), filename);
 	}
 
@@ -132,6 +134,8 @@ public class DataCreatorR
 
 	private void writeDataFile(List<FeatureVector> features, String name)
 	{
+		// check if file present and create new, if so
+
 		try
 		{
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(pathToDataFile + name)));

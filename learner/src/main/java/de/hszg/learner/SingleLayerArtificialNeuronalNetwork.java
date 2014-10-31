@@ -32,33 +32,39 @@ public class SingleLayerArtificialNeuronalNetwork implements Learner {
 
     @Override
     public void learn(List<FeatureVector> trainingSet) {
-        for (FeatureVector featureVector : trainingSet) {
-            boolean[] booleans = new boolean[3];
+        for (int i = 0; i <= 50; i++) {
+            for (FeatureVector featureVector : trainingSet) {
+                boolean[] booleans = new boolean[3];
 
-            int sumOne = neuronOne.calculateSum(featureVector);
-            int sumTwo = neuronTwo.calculateSum(featureVector);
-            int sumThree = neuronThree.calculateSum(featureVector);
+                int sumOne = neuronOne.calculateSum(featureVector);
+                int sumTwo = neuronTwo.calculateSum(featureVector);
+                int sumThree = neuronThree.calculateSum(featureVector);
 
-            booleans[0] = sumOne >= 0;
-            booleans[1] = sumTwo >= 0;
-            booleans[2] = sumThree >= 0;
+                booleans[0] = sumOne >= 0;
+                booleans[1] = sumTwo >= 0;
+                booleans[2] = sumThree >= 0;
 
-            int conceptIndex = this.calculateInt(booleans);
+                int conceptIndex = this.calculateInt(booleans);
 
-            if (!Concept.values()[conceptIndex].equals(featureVector.getConcept())) {
-                int conceptIndexWright = featureVector.getConcept().ordinal();
-                boolean[] booleansWright = this.calculateBooleans(conceptIndexWright);
-
-                if(booleans[0] != booleansWright[0]) {
-                    neuronOne.correctCosts(featureVector, sumOne);
+                if (conceptIndex > 6) {
+                    conceptIndex = 0; //because 7 isn't a possible value and 0 is unknown
                 }
 
-                if(booleans[1] != booleansWright[1]) {
-                    neuronTwo.correctCosts(featureVector, sumTwo);
-                }
+                if (!Concept.values()[conceptIndex].equals(featureVector.getConcept())) {
+                    int conceptIndexWright = featureVector.getConcept().ordinal();
+                    boolean[] booleansWright = this.calculateBooleans(conceptIndexWright);
 
-                if(booleans[2] != booleansWright[2]) {
-                    neuronThree.correctCosts(featureVector, sumThree);
+                    if(booleans[0] != booleansWright[0]) {
+                        neuronOne.correctCosts(featureVector, sumOne);
+                    }
+
+                    if(booleans[1] != booleansWright[1]) {
+                        neuronTwo.correctCosts(featureVector, sumTwo);
+                    }
+
+                    if(booleans[2] != booleansWright[2]) {
+                        neuronThree.correctCosts(featureVector, sumThree);
+                    }
                 }
             }
         }
@@ -78,6 +84,10 @@ public class SingleLayerArtificialNeuronalNetwork implements Learner {
 
         int conceptIndex = this.calculateInt(booleans);
 
+        if (conceptIndex > 6) {
+            conceptIndex = 6;
+        }
+
         return Concept.values()[conceptIndex];
     }
 
@@ -92,7 +102,7 @@ public class SingleLayerArtificialNeuronalNetwork implements Learner {
 
         for (int i = 0; i < booleans.length; i++) {
             if (booleans[i]) {
-                sum += 2^i;
+                sum += Math.pow(2,i);
             }
         }
 
