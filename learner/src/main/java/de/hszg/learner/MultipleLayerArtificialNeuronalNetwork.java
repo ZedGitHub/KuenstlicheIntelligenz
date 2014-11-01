@@ -1,11 +1,16 @@
 package de.hszg.learner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
+import org.neuroph.core.events.LearningEvent;
+import org.neuroph.core.events.LearningEventListener;
+import org.neuroph.core.events.LearningEventType;
+import org.neuroph.core.learning.LearningRule;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
@@ -13,35 +18,57 @@ import org.neuroph.util.TransferFunctionType;
 import de.hszg.learner.featureVector.FeatureVector;
 import de.hszg.learner.featureVector.zed.FeatureVectorZ;
 
-public class MultipleLayerArtificialNeuronalNetwork implements Learner {
+public class MultipleLayerArtificialNeuronalNetwork implements Learner, LearningEventListener  {
 
 	MultiLayerPerceptron perceptronNet;
+	List<Integer> unitsPerLayer;
 	
+	public MultipleLayerArtificialNeuronalNetwork(List<Integer> unitsPerLayer){
+		this.unitsPerLayer = unitsPerLayer;
+		
+		TransferFunctionType funcType = TransferFunctionType.TANH;
+		
+		perceptronNet = new MultiLayerPerceptron(this.unitsPerLayer,funcType);
+		
+		BackPropagation bp = new BackPropagation();
+		perceptronNet.setLearningRule( bp );
+		
+        bp.addListener(this);
+        bp.setLearningRate(0.5);
+        bp.setMaxIterations(100);
+	}
 	
 	public static void main(String[] args){
+		
+		System.out.println("start");
 		
 		int[] a = new int[]{ 1,3,5,7,8,9 };
 		int[] b = new int[]{ 4,3,3,7,8,9 };
 		int[] c = new int[]{ 1,9,5,7,2,9 };
 		int[] d = new int[]{ 1,3,12,7,34,9 };
 		
-		FeatureVector v1 = new FeatureVectorZ( a, Concept.LinksAbbiegen  );
+		FeatureVector v1 = new FeatureVectorZ( a, Concept.VorfahrtVonRechts  );
 		FeatureVector v2 = new FeatureVectorZ( b, Concept.VorfahrtGewaehren  );
 		FeatureVector v3 = new FeatureVectorZ( c, Concept.Stop  );
 		FeatureVector v4 = new FeatureVectorZ( d, Concept.RechtsAbbiegen  );
 		
-		Learner l = new MultipleLayerArtificialNeuronalNetwork();
+		List<Integer> neuronsInLayers = new ArrayList<Integer>();
+		neuronsInLayers.add( new Integer(v1.getNumFeatures()) );
+		neuronsInLayers.add( new Integer(4));
+		neuronsInLayers.add( new Integer( 3 ) );
+		
+		Learner l = new MultipleLayerArtificialNeuronalNetwork(neuronsInLayers);
 		List<FeatureVector> train = new ArrayList<FeatureVector>();
 		train.add(v1);
 		train.add(v2);
 		train.add(v3);
 		train.add(v4);
+		
 		l.learn(train);
 		
-		Concept ca = l.classify(new FeatureVectorZ(new int[]{1,2,3,4,5,6},Concept.Unknown ));
+		Concept ca = l.classify(new FeatureVectorZ(new int[]{1,2,5,7,8,9},Concept.Unknown ));
 		
-		System.out.println(ca);
-		
+		System.out.println("Ergebnis : " + ca);
 	}
 	
 	@Override
@@ -60,20 +87,6 @@ public class MultipleLayerArtificialNeuronalNetwork implements Learner {
 			trainingTuples.addRow(inputData);
 		}
 		
-		// specify the layers and their number of neurons. Each list entry is a layer and
-		// the corresponding number inside the list is the number of units.
-		List<Integer> neuronsInLayers = new ArrayList<Integer>();
-		neuronsInLayers.add( new Integer(inputSize) );
-		neuronsInLayers.add( new Integer(4));
-		neuronsInLayers.add( new Integer( outputSize ) );
-		
-		// create the network
-		TransferFunctionType funcType = TransferFunctionType.TANH;
-		perceptronNet = new MultiLayerPerceptron(neuronsInLayers,funcType);
-		
-		// Set type of learning
-		perceptronNet.setLearningRule( new BackPropagation() );
-		
 		// start learning
 		perceptronNet.learn(trainingTuples);
 		
@@ -89,6 +102,15 @@ public class MultipleLayerArtificialNeuronalNetwork implements Learner {
 		perceptronNet.calculate();
 		
 		double[] output = perceptronNet.getOutput();
+		
+		for( int i = 0; i < output.length; i++ ){
+			double tmp = output[i];
+			if( tmp >= 0.5 ){
+				output[i] = 1;
+			}else{
+				output[i] = 0;
+			}
+		}
 		
 		Concept concept = doublesToConcept(output);
 		
@@ -144,21 +166,28 @@ public class MultipleLayerArtificialNeuronalNetwork implements Learner {
 	 * @note Type double was chosen to prevent type conflicts :-P
 	 * */
 	Concept doublesToConcept( double[] doubles){
-		if( doubles.equals( new double[]{0.0, 0.0, 1.0} ) ){
+		if( Arrays.equals(doubles, new double[]{0.0, 0.0, 1.0} ) ){
 			return Concept.VorfahrtVonRechts;
-		}else if( doubles.equals( new double[]{0.0, 1.0, 0.0} ) ){
+		}else if( Arrays.equals(doubles, new double[]{0.0, 1.0, 0.0} ) ){
 			return Concept.VorfahrtGewaehren;
-		}else if( doubles.equals( new double[]{0.0, 1.0, 1.0} ) ){
+		}else if( Arrays.equals(doubles, new double[]{0.0, 1.0, 1.0} ) ){
 			return Concept.Stop;
-		}else if( doubles.equals( new double[]{1.0, 0.0, 0.0} ) ){
+		}else if( Arrays.equals(doubles, new double[]{1.0, 0.0, 0.0} ) ){
 			return Concept.RechtsAbbiegen;
-		}else if( doubles.equals( new double[]{1.0, 0.0, 1.0} ) ){
+		}else if( Arrays.equals(doubles, new double[]{1.0, 0.0, 1.0} ) ) {
 			return Concept.LinksAbbiegen;
-		}else if( doubles.equals( new double[]{1.0, 1.0, 0.0} ) ){
+		}else if( Arrays.equals(doubles, new double[]{1.0, 1.0, 0.0} ) ){
 			return Concept.Vorfahrtsstrasse;
 		}else {
 			return Concept.Unknown;
 		}
+	}
+
+	@Override
+	public void handleLearningEvent(LearningEvent event) {
+//		BackPropagation bp = (BackPropagation)event.getSource();
+//        if (event.getEventType() != LearningEventType.LEARNING_STOPPED)
+//            System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
 	}
 	
 }
