@@ -17,7 +17,7 @@ public class Neuron {
      *
      * @param numberOfFeatures the number of features in a featureVector
      */
-    public Neuron(int numberOfFeatures) {
+    public void initialize(int numberOfFeatures) {
         Random random = new Random();
 
         this.costs = new int[numberOfFeatures];

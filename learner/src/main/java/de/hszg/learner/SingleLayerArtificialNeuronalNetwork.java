@@ -10,28 +10,29 @@ import de.hszg.learner.featureVector.FeatureVector;
  */
 public class SingleLayerArtificialNeuronalNetwork implements Learner {
 
-    private Neuron neuronOne;
-    private Neuron neuronTwo;
-    private Neuron neuronThree;
+    private Neuron neuronOne = null;
+    private Neuron neuronTwo = null;
+    private Neuron neuronThree = null;
 
     /**
-     * Since a initialization of the class is needed this constructor is forbidden
+     * learns the concept and initializes the neuronal Network
+     * @param trainingSet contains feature vectors and corresponding concepts
      */
-    private SingleLayerArtificialNeuronalNetwork(){}
-
-    /**
-     * This initializes the single layer artificial neuronal network
-     *
-     * @param numberOfFeatures the number of features which are in the featureVector
-     */
-    public SingleLayerArtificialNeuronalNetwork(int numberOfFeatures) {
-        neuronOne = new Neuron(numberOfFeatures);
-        neuronTwo = new Neuron(numberOfFeatures);
-        neuronThree = new Neuron(numberOfFeatures);
-    }
-
     @Override
     public void learn(List<FeatureVector> trainingSet) {
+        if (neuronOne == null) {
+            neuronOne = new Neuron();
+            neuronOne.initialize(trainingSet.get(0).getNumFeatures());
+        }
+        if (neuronTwo == null) {
+            neuronTwo = new Neuron();
+            neuronTwo.initialize(trainingSet.get(0).getNumFeatures());
+        }
+        if (neuronThree == null) {
+            neuronThree = new Neuron();
+            neuronThree.initialize(trainingSet.get(0).getNumFeatures());
+        }
+
         for (int i = 0; i <= 50; i++) {
             for (FeatureVector featureVector : trainingSet) {
                 boolean[] booleans = new boolean[3];

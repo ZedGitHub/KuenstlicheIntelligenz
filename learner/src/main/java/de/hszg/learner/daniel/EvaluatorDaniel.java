@@ -23,11 +23,9 @@ public class EvaluatorDaniel {
 
 	public EvaluatorDaniel(String filename) {
         int i = 0;
-        int numberOfTests = 1000;
+        int numberOfTests = 100;
 
 		List<FeatureVector> vectors = readData(filename);
-
-        vectors.forEach(System.out::println);
 
         float success = 0;
         float unknown = 0;
@@ -38,7 +36,7 @@ public class EvaluatorDaniel {
         // Verschiedene Teilmengen finden und Verschiedene Reihenfolgen festlegen,
         // wie oft, das h�ngt vom gew�nschten Vertrauensintervall ab
         do{
-            Learner learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures());
+            Learner learner = new SingleLayerArtificialNeuronalNetwork();
 
 			vectors = mixData(vectors);
 			List<List<FeatureVector>> sets = extractTrainingData(vectors);
