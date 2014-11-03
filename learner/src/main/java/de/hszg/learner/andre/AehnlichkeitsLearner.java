@@ -15,7 +15,13 @@ import de.hszg.learner.featureVector.FeatureVector;
 
 public class AehnlichkeitsLearner implements Learner{
 
-	private List<LearnedFeatureVector> learnedVectorList = new ArrayList<LearnedFeatureVector>();
+	private List<LearnedFeatureVector> learnedVectorList = null;
+	
+	public AehnlichkeitsLearner(){
+		if(learnedVectorList==null){
+			learnedVectorList = new ArrayList<LearnedFeatureVector>();
+		}
+	}
 	
 	@Override
 	public void learn(List<FeatureVector> trainingSet) {

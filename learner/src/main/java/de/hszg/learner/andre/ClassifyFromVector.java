@@ -1,5 +1,6 @@
 package de.hszg.learner.andre;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +9,12 @@ import java.util.Map;
 
 import de.hszg.learner.Concept;
 import de.hszg.learner.featureVector.FeatureVector;
+
+/**
+ * 
+ * @author Andre Krause
+ *
+ */
 
 public class ClassifyFromVector {
 
@@ -26,7 +33,7 @@ public class ClassifyFromVector {
 		Arrays.sort(distanceArray);
 		
 		if(checkLeastDistanceUnique(distanceArray[0])>1){
-			return Concept.Unknown;
+			return getRandomConcept(distanceArray[0]);
 		}
 		else{
 			return getLeastDistanceConcept(distanceArray[0]);
@@ -78,5 +85,19 @@ public class ClassifyFromVector {
 		}
 		
 		return temp;
+	}
+	
+	private static Concept getRandomConcept(double leastDistance){
+		List<Concept> conceptList = new ArrayList<Concept>();
+		
+		for(int i = 1; i < Concept.values().length; i++){
+			if(distanceToConceptMap.get(Concept.values()[i]) == leastDistance){
+				conceptList.add(Concept.values()[i]);
+			}
+		}
+		
+		int randomConcept = 1 + (int)(Math.random() * ((conceptList.size() - 1) + 1));
+		
+		return conceptList.get(randomConcept-1);
 	}
 }
