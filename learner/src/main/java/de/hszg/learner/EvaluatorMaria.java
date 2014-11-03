@@ -19,6 +19,7 @@ import org.apache.commons.math.distribution.TDistributionImpl;
 import org.apache.commons.math.exception.MathIllegalArgumentException;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
+import de.hszg.learner.andre.AehnlichkeitsLearner;
 import de.hszg.learner.featureVector.FeatureVector;
 
 
@@ -30,11 +31,20 @@ public class EvaluatorMaria {
 	*/
 	private static int testRate = 40; 
 	private ArrayList<Double> means = new ArrayList<>();
+	private ArrayList<Double> unknown = new ArrayList<>();
+	private ArrayList<Double> wrong = new ArrayList<>();
 	
 	public EvaluatorMaria(String filename) {
 		List<FeatureVector> vectors = readData(filename); 
 		
-		Learner learner = new DummyLearner();
+		//Learner learner = new DummyLearner();
+		//Learner learner = new SingleLayerArtificialNeuronalNetwork();
+		//Learner learner = new AehnlichkeitsLearner();
+		//Learner learner = new MultipleLayerArtificialNeuronalNetwork();
+		//Learner learner = new BackPropagation();
+		//Learner learner = new DecisionTreeCal2();
+		//Learner learner = new DecisionTreeCal2MitVorverarbeitung3Klassen();
+		Learner learner = new DecisionTreeCal2MitVorverarbeitung10Klassen();
 		
 		int i=0;
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgefuehrt werden
@@ -49,12 +59,26 @@ public class EvaluatorMaria {
 			i++;
 		}while(i<101); //TODO: eine andere Abbruchbedingung verwenden
 		
-		double sum =0; 
+		double sumMeans =0;
+		double sumWrong =0;
+		double sumUnknown =0;
 		for (Double d : means)
 		{
-			sum+=d;
+			sumMeans+=d;
 		}
-		System.out.println("Im Durchnitt "+ (sum/means.size())+"% Richtig");
+		System.out.println("Im Durchnitt "+ (sumMeans/means.size())+"% Richtig");
+		
+		for (Double d : wrong)
+		{
+			sumWrong+=d;
+		}
+		System.out.println("Im Durchnitt "+ (sumWrong/wrong.size())+"% Schlecht");
+		
+		for (Double d : unknown)
+		{
+			sumUnknown+=d;
+		}
+		System.out.println("Im Durchnitt "+ (sumUnknown/unknown.size())+"% Unbekannt");
 		
 		SummaryStatistics stats = new SummaryStatistics();
 	        for (double val : means) {
@@ -92,8 +116,8 @@ private static double calcMeanCI(SummaryStatistics stats, double level) {
 		
 		float sum=result.get(0)+result.get(1)+result.get(2); //sume
 		means.add((double) ((result.get(0)/sum)*100));//habe ein Liste wo der richten sind (%)
-		
-		
+		wrong.add((double) ((result.get(2)/sum)*100));
+		unknown.add((double) ((result.get(1)/sum)*100));
 		
 		System.out.println("Learning result: \n correct: "+result.get(0)+"\n unknown: "+result.get(1)+"\n wrong: "+result.get(2));
 	}
@@ -183,7 +207,9 @@ private Vector<Integer> evaluate(List<FeatureVector> list, Learner learner) {
 	public static void main(String[] args){
 		
 		
-		URL url = EvaluatorMaria.class.getResource("/zdata.dat");
+		URL url = EvaluatorMaria.class.getResource("/zDummyData.dat");
+		//URL url = EvaluatorMaria.class.getResource("/zData.dat");
+		//URL url = EvaluatorMaria.class.getResource("/zData2.dat");
 		
 		File file = null;
 		
