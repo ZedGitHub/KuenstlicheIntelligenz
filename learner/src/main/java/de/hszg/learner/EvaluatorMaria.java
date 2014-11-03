@@ -39,12 +39,12 @@ public class EvaluatorMaria {
 		
 		//Learner learner = new DummyLearner();
 		//Learner learner = new SingleLayerArtificialNeuronalNetwork();
-		//Learner learner = new AehnlichkeitsLearner();
+		//Learner learner = new AehnlichkeitsLearner(); 
 		//Learner learner = new MultipleLayerArtificialNeuronalNetwork();
-		//Learner learner = new BackPropagation();
+		//Learner learner = new learner.romano.id3();
 		//Learner learner = new DecisionTreeCal2();
 		//Learner learner = new DecisionTreeCal2MitVorverarbeitung3Klassen();
-		Learner learner = new DecisionTreeCal2MitVorverarbeitung10Klassen();
+		//Learner learner = new DecisionTreeCal2MitVorverarbeitung10Klassen();
 		
 		int i=0;
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgefuehrt werden
