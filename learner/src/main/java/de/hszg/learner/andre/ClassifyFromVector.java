@@ -96,8 +96,8 @@ public class ClassifyFromVector {
 			}
 		}
 		
-		int randomConcept = (int) Math.random() * (conceptList.size() + 1 - 1) + 1;
+		int randomConcept = 1 + (int)(Math.random() * ((conceptList.size() - 1) + 1));
 		
-		return conceptList.get(randomConcept);
+		return conceptList.get(randomConcept-1);
 	}
 }
