@@ -34,7 +34,8 @@ public class EvaluatorMaria {
 	public EvaluatorMaria(String filename) {
 		List<FeatureVector> vectors = readData(filename); 
 		
-		Learner learner = new DummyLearner();
+		//Learner learner = new DummyLearner();
+		Learner learner = new SingleLayerArtificialNeuronalNetwork(vectors.get(0).getNumFeatures());
 		
 		int i=0;
 		// TODO: folgendes muss zur Evaluierung mehrfach ausgefuehrt werden
