@@ -48,17 +48,26 @@ public class ClassifyFromVector {
 		
 		double distancePerVector = 0.0;
 		
+		if(learnedVectorList.size()>6){
+			System.out.println("Test");
+		}
+		
 		for(int i = 0; i < learnedVectorList.size(); i++){
 			distancePerVector = 0.0;
 			
 			LearnedFeatureVector temp = learnedVectorList.get(i);
 			
-			for(int j = 0; j < temp.getNumFeatures(); j++){
-				distancePerVector += (example.getFeatureValue(j) - temp.getFeatureValue(j)) * (example.getFeatureValue(j) - temp.getFeatureValue(j));
+			if(temp!=null){
+				for(int j = 0; j < temp.getNumFeatures(); j++){
+					distancePerVector += (example.getFeatureValue(j) - temp.getFeatureValue(j)) * (example.getFeatureValue(j) - temp.getFeatureValue(j));
+				}
+				
+				distanceToConceptMap.put(temp.getConcept(), Math.sqrt(distancePerVector));
+				distanceArray[i] = Math.sqrt(distancePerVector);		
 			}
-			
-			distanceToConceptMap.put(temp.getConcept(), Math.sqrt(distancePerVector));
-			distanceArray[i] = Math.sqrt(distancePerVector);
+			else{
+				distanceArray[i] = Integer.MAX_VALUE;
+			}
 		}
 		
 	}
@@ -79,8 +88,10 @@ public class ClassifyFromVector {
 		Concept temp = Concept.Unknown;
 		
 		for(int i = 1; i < Concept.values().length; i++){
-			if(distanceToConceptMap.get(Concept.values()[i]) == leastDistance){
-				temp = Concept.values()[i];
+			if(distanceToConceptMap.get(Concept.values()[i]) != null){
+				if(distanceToConceptMap.get(Concept.values()[i]) == leastDistance){
+					temp = Concept.values()[i];
+				}
 			}
 		}
 		
@@ -91,8 +102,10 @@ public class ClassifyFromVector {
 		List<Concept> conceptList = new ArrayList<Concept>();
 		
 		for(int i = 1; i < Concept.values().length; i++){
-			if(distanceToConceptMap.get(Concept.values()[i]) == leastDistance){
-				conceptList.add(Concept.values()[i]);
+			if(distanceToConceptMap.get(Concept.values()[i])!=null){
+				if(distanceToConceptMap.get(Concept.values()[i]) == leastDistance){
+					conceptList.add(Concept.values()[i]);
+				}
 			}
 		}
 		

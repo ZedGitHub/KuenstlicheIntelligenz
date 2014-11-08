@@ -26,6 +26,8 @@ public class AehnlichkeitsLearner implements Learner{
 	@Override
 	public void learn(List<FeatureVector> trainingSet) {
 		
+		learnedVectorList.clear();
+		
 		for(int i = 1; i<Concept.values().length; i++){
 			learnedVectorList.add(LearnFromVector.splitAndcalculateLearnedVector(trainingSet, Concept.values()[i]));
 		}

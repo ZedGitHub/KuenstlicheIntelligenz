@@ -21,25 +21,32 @@ public class LearnFromVector {
 		List<FeatureVector> temp = featureVectorList.stream().filter(f -> f.getConcept().equals(concept)).collect(Collectors.toList());
 
 		double featureSum = 0.0;
+		
 		List<Double> featureList = new ArrayList<Double>();
-
-		for (int i = 0; i < temp.get(0).getNumFeatures(); i++) {
-
-			featureSum = 0;
-
-			for (int j = 0; j < temp.size(); j++) {
-				featureSum += temp.get(j).getFeatureValue(i);
+		
+		if(temp.size() > 0){
+	
+			for (int i = 0; i < temp.get(0).getNumFeatures(); i++) {
+	
+				featureSum = 0;
+	
+				for (int j = 0; j < temp.size(); j++) {
+					featureSum += temp.get(j).getFeatureValue(i);
+				}
+	
+				if (featureSum == 0) {
+					featureList.add(0.0);
+				} else {
+					featureList.add(featureSum / temp.size());
+				}
 			}
-
-			if (featureSum == 0) {
-				featureList.add(0.0);
-			} else {
-				featureList.add(featureSum / temp.size());
-			}
+	
+			LearnedFeatureVector tempVector = new LearnedFeatureVector(featureList, concept);
+	
+			return tempVector;
+		
 		}
-
-		LearnedFeatureVector tempVector = new LearnedFeatureVector(featureList, concept);
-
-		return tempVector;
+		
+		return null;
 	}
 }
