@@ -48,10 +48,6 @@ public class ClassifyFromVector {
 		
 		double distancePerVector = 0.0;
 		
-		if(learnedVectorList.size()>6){
-			System.out.println("Test");
-		}
-		
 		for(int i = 0; i < learnedVectorList.size(); i++){
 			distancePerVector = 0.0;
 			
