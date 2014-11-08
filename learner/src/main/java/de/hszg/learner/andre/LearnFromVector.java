@@ -15,8 +15,7 @@ import de.hszg.learner.featureVector.FeatureVector;
 
 public class LearnFromVector {
 
-	public static LearnedFeatureVector splitAndcalculateLearnedVector(
-		List<FeatureVector> featureVectorList, Concept concept) {
+	public static LearnedFeatureVector splitAndcalculateLearnedVector(List<FeatureVector> featureVectorList, Concept concept) {
 
 		List<FeatureVector> temp = featureVectorList.stream().filter(f -> f.getConcept().equals(concept)).collect(Collectors.toList());
 
